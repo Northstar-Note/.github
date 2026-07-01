@@ -99,7 +99,7 @@ img{display:block; max-width:100%;}
 .member .role{font-size:12px; font-weight:500; letter-spacing:.1em; color:var(--accent); margin-bottom:9px;}
 .member h4{margin:0 0 10px; font-weight:600; font-size:19px; letter-spacing:-.02em;}
 .member p{margin:0; font-size:14.5px; font-weight:400; color:var(--soft); line-height:1.85;}
-.member .mail{display:inline-block; margin-top:14px; font-size:13px; color:var(--soft); border-bottom:1px solid var(--line); padding-bottom:2px; transition:color .25s, border-color .25s;}
+.member .mail{display:inline-block; margin:2px 0 16px; font-size:13px; color:var(--soft); border-bottom:1px solid var(--line); padding-bottom:2px; transition:color .25s, border-color .25s;}
 .member .mail:hover{color:var(--accent); border-color:var(--accent);}
 
 /* colophon (about §4) */
