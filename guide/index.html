@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 가이드 · 북극성과 시행착오 노트</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<style>
+  /* guide-only helpers */
+  .g-swatches{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px;}
+  .g-sw{border:1px solid var(--line); border-radius:14px; overflow:hidden; background:var(--surface);}
+  .g-sw .chip{height:88px;}
+  .g-sw .m{padding:14px 16px;}
+  .g-sw .n{font-weight:600; font-size:14px;}
+  .g-sw .hex{font-size:12.5px; color:var(--faint); margin:3px 0 8px; letter-spacing:.02em;}
+  .g-sw .u{font-size:12.5px; color:var(--soft); line-height:1.6;}
+  .g-type>div{border-top:1px solid var(--line); padding:22px 0; display:grid; grid-template-columns:130px 1fr; gap:24px; align-items:baseline;}
+  .g-type .lab{font-size:12px; font-weight:500; letter-spacing:.13em; color:var(--faint);}
+  .g-type .spec{font-size:12.5px; color:var(--soft); margin-top:8px; line-height:1.7;}
+  .g-2{display:grid; grid-template-columns:1fr 1fr; gap:clamp(20px,3vw,32px);}
+  .g-note{font-size:13px; color:var(--soft); margin-top:12px; line-height:1.7;}
+  .g-star{display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
+  .g-star .tile{width:48px; height:48px; border-radius:11px; background:#20261F; display:flex; align-items:center; justify-content:center;}
+  .g-do{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:14px; overflow:hidden;}
+  .g-do>div{background:var(--bg); padding:22px 24px;}
+  .g-do h4{margin:0 0 12px; font-size:12px; font-weight:600; letter-spacing:.1em;}
+  .g-do ul{margin:0; padding-left:18px; font-size:14px; color:var(--soft); line-height:1.9;}
+  @media(max-width:700px){ .g-2,.g-do{grid-template-columns:1fr;} .g-type>div{grid-template-columns:1fr; gap:8px;} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="nav rise">
+    <a href="../" class="brand"><svg class="brandmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 L13.7 10.3 L23 12 L13.7 13.7 L12 23 L10.3 13.7 L1 12 L10.3 10.3 Z" fill="currentColor"/></svg>북극성과 시행착오 노트</a>
+    <div class="links">
+      <a href="../about/">소개</a>
+      <a href="../issues/">발행 목록</a>
+      <a href="./" class="no">가이드</a>
+    </div>
+  </header>
+
+  <header class="phead rise" style="animation-delay:.05s;">
+    <span class="eyebrow">디자인 가이드 · Design Guide</span>
+    <h1>조용하게,<br>그러나 분명하게</h1>
+    <p>《북극성과 시행착오 노트》의 색·활자·여백·컴포넌트·목소리를 한곳에 모았습니다. 프리미엄하고 담담한 톤 — 기능이 아니라 분위기와 흐름이 먼저입니다.</p>
+  </header>
+
+  <!-- 원칙 -->
+  <div class="shead"><h2>원칙</h2></div>
+  <section class="about">
+    <h3>기능이 아니라<br>조용한 흐름</h3>
+    <div class="col">
+      <p>낮은 채도의 세이지 뉴트럴 위에, 단일 서체(SUIT)와 넉넉한 여백으로 짓습니다. 강조는 단 하나의 색, 구조는 얇은 괘선 하나. 화려함보다 오래 견디는 품위를 택합니다.</p>
+      <p>과장하지 않고, 서두르지 않습니다. 시선이 제목 → 핵심 → 설명으로 자연스럽게 흐르게 두고, 나머지는 비웁니다.</p>
+    </div>
+  </section>
+
+  <!-- 색 -->
+  <div class="shead"><h2>색</h2><span class="rt">저채도 · 강조 1색</span></div>
+  <section class="g-swatches">
+    <div class="g-sw"><div class="chip" style="background:#E7EAE3"></div><div class="m"><div class="n">캔버스</div><div class="hex">#E7EAE3</div><div class="u">기본 배경 (misty sage)</div></div></div>
+    <div class="g-sw"><div class="chip" style="background:#F1F3ED"></div><div class="m"><div class="n">서피스</div><div class="hex">#F1F3ED</div><div class="u">카드·패널 밝은 면</div></div></div>
+    <div class="g-sw"><div class="chip" style="background:#282B26"></div><div class="m"><div class="n">잉크</div><div class="hex">#282B26</div><div class="u">제목·본문 글자</div></div></div>
+    <div class="g-sw"><div class="chip" style="background:#5F635B"></div><div class="m"><div class="n">소프트</div><div class="hex">#5F635B</div><div class="u">보조 텍스트</div></div></div>
+    <div class="g-sw"><div class="chip" style="background:#989C90"></div><div class="m"><div class="n">페인트</div><div class="hex">#989C90</div><div class="u">라벨·메타·인덱스</div></div></div>
+    <div class="g-sw"><div class="chip" style="background:#D6DACF"></div><div class="m"><div class="n">헤어라인</div><div class="hex">#D6DACF</div><div class="u">구분선·테두리</div></div></div>
+    <div class="g-sw"><div class="chip" style="background:#4E5D51"></div><div class="m"><div class="n">세이지 (강조)</div><div class="hex">#4E5D51</div><div class="u">강조 한 가지 · 브랜드 마크 · hover</div></div></div>
+    <div class="g-sw"><div class="chip" style="background:linear-gradient(158deg,#252D23,#151A14)"></div><div class="m"><div class="n">다크 패널</div><div class="hex">#20261F → #151A14</div><div class="u">커버·밴드 (글자 #E8EBE2)</div></div></div>
+  </section>
+  <p class="g-note">원칙 — 배경·서피스는 채도 15% 이하로 조용하게. 강조는 <b style="color:var(--accent)">세이지 한 가지</b>로만, 획 하나 수준으로 절제. 그라데이션·형광·다색·그림자 남용 금지.</p>
+
+  <!-- 활자 -->
+  <div class="shead"><h2>활자</h2><span class="rt">SUIT 단일</span></div>
+  <section class="g-type">
+    <div><div class="lab">표제 · Display</div><div><div style="font-weight:500; font-size:clamp(30px,4.6vw,52px); line-height:1.1; letter-spacing:-.04em;">반 발짝 먼저</div><div class="spec">SUIT 500 · 자간 -.035~-.04em · 크게, 타이트하게</div></div></div>
+    <div><div class="lab">소제목</div><div><div style="font-weight:600; font-size:24px; letter-spacing:-.02em;">우리가 지키려는 것들</div><div class="spec">SUIT 600 · 자간 -.02em</div></div></div>
+    <div><div class="lab">본문 · Body</div><div><div style="font-weight:400; font-size:17px; line-height:1.85; color:var(--ink); max-width:44ch;">직접 해본 것만 적습니다. 어떤 도구를 얼마 주고 썼고, 무엇을 만들었는지까지.</div><div class="spec">SUIT 400 · 16–18px · 행간 1.85–1.95 · 색 잉크/소프트</div></div></div>
+    <div><div class="lab">라벨 · Meta</div><div><div class="eyebrow">솔로프리너 클럽 · 격주 발행</div><div class="spec">SUIT 500 · 12px · 자간 .14em · 색 페인트</div></div></div>
+    <div><div class="lab">인덱스 숫자</div><div><div class="num" style="font-size:56px; line-height:1; color:var(--faint);">03</div><div class="spec">SUIT 200 (thin) · tabular · 커버·강령 번호</div></div></div>
+  </section>
+  <p class="g-note">위계는 <b>크기·굵기·색</b>만으로. 서체는 SUIT 하나로 통일 — 세리프·모노 혼용 금지(가독성·일관성). 굵기는 Medium/SemiBold 중심, Bold 남발 금지. 전역 <span style="color:var(--soft)">word-break:keep-all</span>.</p>
+
+  <!-- 레이아웃 -->
+  <div class="shead"><h2>레이아웃 · 여백</h2></div>
+  <section class="g-2">
+    <div>
+      <div class="eyebrow" style="display:block; margin-bottom:14px;">구조</div>
+      <p style="margin:0; font-size:15.5px; color:var(--soft); line-height:1.9;">콘텐츠 max 1220 / 본문 measure 720. 비대칭 그리드(히어로 1:1, 소개 5:7)로 공간을 채웁니다. 구획은 <b style="color:var(--ink)">1px 헤어라인</b> 하나로.</p>
+    </div>
+    <div>
+      <div class="eyebrow" style="display:block; margin-bottom:14px;">모서리 · 결</div>
+      <p style="margin:0; font-size:15.5px; color:var(--soft); line-height:1.9;">라운드 — 커버 24 · 카드 20 · 아바타 원. 전면에 아주 옅은 <b style="color:var(--ink)">필름 그레인</b>(opacity .045)으로 촉감. 여백은 크게, 그러나 구성으로 채워 빈 느낌을 없앱니다.</p>
+    </div>
+  </section>
+
+  <!-- 컴포넌트 -->
+  <div class="shead"><h2>컴포넌트</h2></div>
+
+  <div class="g-2" style="margin-bottom:clamp(20px,3vw,32px);">
+    <!-- cover mini -->
+    <div>
+      <div class="eyebrow" style="display:block; margin-bottom:14px;">커버 카드 (다크)</div>
+      <div class="card"><div class="mini t3" style="min-height:180px;"><div class="ghost num">03</div><span class="eyc">이번 호 · № 003</span></div></div>
+      <p class="g-note">다크 그라데이션 + 얇은 이너 보더 + edge로 흐르는 고스트 숫자. hover 시 살짝 뜸.</p>
+    </div>
+    <!-- pull quote -->
+    <div>
+      <div class="eyebrow" style="display:block; margin-bottom:14px;">풀쿼트</div>
+      <blockquote class="pq" style="margin:0; text-align:left;"><p style="font-size:22px;">에너지의 대부분은, 사람을 관리하는 데 들어갔습니다.</p></blockquote>
+      <p class="g-note">세이지 짧은 룰 + 큰 SUIT 500. 밑줄·따옴표 장식 없이.</p>
+    </div>
+  </div>
+
+  <div class="g-2" style="margin-bottom:clamp(20px,3vw,32px);">
+    <!-- spec -->
+    <div>
+      <div class="eyebrow" style="display:block; margin-bottom:14px;">스펙 표</div>
+      <dl class="spec" style="margin:0;">
+        <div class="cap">무대 · 매체 · 반응</div>
+        <div class="r"><dt>무대</dt><dd>EBS 강의 · 지인 추천</dd></div>
+        <div class="r"><dt>평가</dt><dd>3개 중 2위</dd></div>
+      </dl>
+    </div>
+    <!-- tenet -->
+    <div>
+      <div class="eyebrow" style="display:block; margin-bottom:14px;">강령 · 원칙</div>
+      <div class="tenet" style="border-top:1px solid var(--line);"><div class="tn num">01</div><div><h3>직접 해본 것만.</h3><p>인덱스 숫자(thin) + 제목 + 설명.</p></div></div>
+    </div>
+  </div>
+
+  <div class="g-2">
+    <!-- member -->
+    <div>
+      <div class="eyebrow" style="display:block; margin-bottom:14px;">멤버 카드</div>
+      <div class="member"><div class="avatar"><span class="num">02</span></div><div class="role">전직 변호사</div><h4>철학과 거버넌스, 서재</h4><p>반려 AI들과 함께 지식과 철학을 쌓아 올립니다.</p><p class="contact"><a href="#"><svg class="mail-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="1.5"/><path d="M3 6.5 L12 13 L21 6.5"/></svg>name@domain.com</a></p></div>
+      <p class="g-note">아바타(인덱스) → 역할 → 이름 → 소개 → Contact. 연락처는 하단, 밑줄 없이 라벨로.</p>
+    </div>
+    <!-- brand -->
+    <div>
+      <div class="eyebrow" style="display:block; margin-bottom:14px;">브랜드 마크</div>
+      <div class="g-star">
+        <svg viewBox="0 0 24 24" width="20" height="20" style="color:var(--accent)"><path d="M12 1 L13.7 10.3 L23 12 L13.7 13.7 L12 23 L10.3 13.7 L1 12 L10.3 10.3 Z" fill="currentColor"/></svg>
+        <svg viewBox="0 0 24 24" width="34" height="34" style="color:var(--accent)"><path d="M12 1 L13.7 10.3 L23 12 L13.7 13.7 L12 23 L10.3 13.7 L1 12 L10.3 10.3 Z" fill="currentColor"/></svg>
+        <span class="tile"><svg viewBox="0 0 32 32" width="30" height="30"><path d="M16 5 L17.7 14.3 L27 16 L17.7 17.7 L16 27 L14.3 17.7 L5 16 L14.3 14.3 Z" fill="#E8EBE2"/></svg></span>
+      </div>
+      <p class="g-note">북극성 4-포인트 스타. 헤더는 세이지 라인, 파비콘은 다크 타일 + 종이색 별. currentColor로 테마 상속.</p>
+    </div>
+  </div>
+
+  <!-- 모션 -->
+  <div class="shead"><h2>모션</h2></div>
+  <section class="g-2">
+    <div><div class="eyebrow" style="display:block; margin-bottom:14px;">진입 · Rise</div><p style="margin:0; font-size:15.5px; color:var(--soft); line-height:1.9;">translateY 14→0 + fade, .9–1s <span style="color:var(--ink)">cubic-bezier(.2,.7,.2,1)</span>. 스태거로 순차 등장.</p></div>
+    <div><div class="eyebrow" style="display:block; margin-bottom:14px;">hover</div><p style="margin:0; font-size:15.5px; color:var(--soft); line-height:1.9;">카드 살짝 뜸(translateY -5 + soft shadow), 링크 언더라인 슬라이드, 고스트 숫자 미세 확대. 전부 부드럽게, <span style="color:var(--ink)">prefers-reduced-motion 존중</span>.</p></div>
+  </section>
+
+  <!-- 목소리 -->
+  <div class="shead"><h2>목소리</h2></div>
+  <section class="g-do">
+    <div><h4 style="color:var(--accent)">이렇게</h4><ul>
+      <li>직접 해본 1인칭으로</li>
+      <li>구체적으로 (도구·비용·횟수)</li>
+      <li>옆자리에서 말하듯이</li>
+      <li>담담하되, 분명하게</li>
+    </ul></div>
+    <div><h4 style="color:#A8574A">이렇게는 않게</h4><ul>
+      <li>포모 · 과장 · 호언장담</li>
+      <li>두루뭉술한 “AI로 했어요”</li>
+      <li>무대 위 선언 · 구루 화법</li>
+      <li>억지 교훈 (없으면 없는 대로)</li>
+    </ul></div>
+  </section>
+  <p class="g-note" style="text-align:center; margin-top:26px; font-size:15px;">서두르지 않습니다. 다만, 끝까지 만들어볼 뿐이에요. · <span style="color:var(--soft)">No rush, no hype. We just keep building.</span></p>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="b">
+      <p class="fs">Spectators predict. We prove.</p>
+      <p class="fk">구경꾼은 예측하고, 우리는 증명한다 · 디자인 가이드 v1</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
