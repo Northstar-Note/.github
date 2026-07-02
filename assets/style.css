@@ -157,6 +157,15 @@ img{display:block; max-width:100%;}
 .band figure{margin:0;}
 .band figcaption{font-size:11.5px; letter-spacing:.02em; color:var(--panel-soft); margin-top:16px;}
 
+/* plate — embedded original illustration */
+.plate{margin:clamp(30px,5vh,48px) 0;}
+.plate img{width:100%; height:auto; border-radius:3px;}
+.plate figcaption{margin-top:13px; font-size:12px; letter-spacing:.02em; color:var(--faint); text-align:center; line-height:1.7;}
+.faces{display:flex; gap:24px; margin-bottom:22px;}
+.faces figure{margin:0; text-align:center;}
+.faces img{width:62px; height:62px; border-radius:50%;}
+.faces figcaption{margin-top:8px; font-size:11px; letter-spacing:.05em; color:var(--faint);}
+
 /* author + pager */
 .author{display:grid; grid-template-columns:60px 1fr; gap:20px; align-items:start; border-top:1px solid var(--line); padding:30px 0; margin-top:clamp(20px,4vh,40px);}
 .author .av{width:60px; height:60px; border-radius:50%; background:#D7DCD0; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--soft);}
