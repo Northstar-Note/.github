@@ -1,5 +1,7 @@
 # 구독(subscription) 저장 설정 — Cloudflare D1
 
+> ✅ 2026-07-03 설정 완료 · 라이브 검증됨. DB `northstar-subscribers` 생성 + 테이블 적용 + `DB` 바인딩 + `ADMIN_KEY`(32-hex, 대시보드 env var) 설정. `POST /api/subscribe` → `{ok:true}`, `/admin?key=<ADMIN_KEY>` 표/CSV 정상. 아래는 재설정/참고용.
+
 구독 폼(`/#subscribe`)은 `POST /api/subscribe` → Cloudflare **D1** DB에 저장하고,
 `/admin?key=...` 에서 구독자 목록을 표로 보고 CSV로 내려받는다.
 D1 바인딩이 없으면 폼은 자동으로 이메일(mailto) 폴백으로 동작(구독자 유실 없음).

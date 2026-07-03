@@ -207,6 +207,11 @@ footer .fc p{margin:0; font-size:14px; color:var(--soft); line-height:1.8;}
 .card.locked .mini.t1 .lockbadge, .card.locked .mini.t2 .lockbadge{background:rgba(46,42,34,.16); border-color:rgba(46,42,34,.2); color:#3B372E;}
 .lockbadge svg{width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round;}
 .card.locked .body .k, .ientry.locked .txt .read{color:var(--faint);}
+/* Locked hero cover (№001 gated at 창간) — keep it clickable to #subscribe, but read as locked. */
+.cover.locked{cursor:pointer;}
+.cover.locked:hover{transform:translateY(-3px); box-shadow:0 24px 60px rgba(30,36,28,.22);}
+.cover.locked .lockbadge{position:absolute;}
+.cover.locked .read{border-bottom-color:rgba(232,235,226,.42);}
 
 /* ── lock screen (direct-URL gate for upcoming issues) ── */
 .gate{max-width:640px; margin:0 auto; padding:clamp(70px,16vh,150px) 0 clamp(50px,10vh,110px); text-align:center;}
