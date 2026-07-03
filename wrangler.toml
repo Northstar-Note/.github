@@ -3,10 +3,18 @@ name = "northstar-note"
 pages_build_output_dir = "."
 compatibility_date = "2026-07-03"
 
-# NOTE: D1 binding "DB" and secret "ADMIN_KEY" are configured in the
-# Cloudflare dashboard (Workers & Pages → project → Settings), NOT here —
-# a placeholder database_id would fail the Pages build. See SUBSCRIBE-SETUP.md.
-
+# ── Config split (READ BEFORE EDITING) ──────────────────────────────────────
+# The D1 binding below MUST stay in this file — it is what makes subscription
+# storage work. Do NOT delete this [[d1_databases]] block to "fix" /admin 401:
+# that was tried (commit 5267fc6) and reverted (9037558) because removing it
+# drops the DB binding and breaks the subscribe form.
+#
+# GOTCHA: once a [[d1_databases]] block lives here, Pages reads config from this
+# file and IGNORES dashboard *plaintext* environment variables — which silently
+# drops a plaintext ADMIN_KEY and makes /admin return 401 for every key.
+# FIX: set ADMIN_KEY as an *encrypted Secret* in the dashboard, not a plaintext
+# var. Secrets are stored separately and survive alongside this file.
+# See SUBSCRIBE-SETUP.md.
 [[d1_databases]]
 binding = "DB"
 database_name = "northstar-subscribers"
