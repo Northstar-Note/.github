@@ -6,7 +6,15 @@ const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': 
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
   const key = url.searchParams.get('key') || '';
-  if (!env.ADMIN_KEY || key !== env.ADMIN_KEY) {
+  // Distinguish "server has no ADMIN_KEY" from "wrong key" so a dropped secret
+  // (e.g. plaintext var shadowed by wrangler.toml) is diagnosable, not a mute 401.
+  if (!env.ADMIN_KEY) {
+    return new Response(
+      'ADMIN_KEY not configured on the server — set it as an encrypted Secret in the Cloudflare dashboard (see SUBSCRIBE-SETUP.md).',
+      { status: 503 },
+    );
+  }
+  if (key !== env.ADMIN_KEY) {
     return new Response('Unauthorized — append ?key=YOUR_ADMIN_KEY', { status: 401 });
   }
   if (!env.DB) return new Response('D1 not configured (see wrangler.toml + README).', { status: 503 });
