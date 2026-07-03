@@ -14,7 +14,9 @@ export async function onRequestGet({ request, env }) {
       { status: 503 },
     );
   }
-  if (key !== env.ADMIN_KEY) {
+  // Compare trimmed: a secret piped in with a trailing newline (common with
+  // `echo`/`<<<`) would otherwise never match the query param and 401 forever.
+  if (key.trim() !== String(env.ADMIN_KEY).trim()) {
     return new Response('Unauthorized — append ?key=YOUR_ADMIN_KEY', { status: 401 });
   }
   if (!env.DB) return new Response('D1 not configured (see wrangler.toml + README).', { status: 503 });
