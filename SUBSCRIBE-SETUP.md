@@ -19,9 +19,23 @@ wrangler d1 execute northstar-subscribers --remote --file=./schema.sql
 그다음 **Cloudflare 대시보드**에서 사이트에 연결(빌드 안정성 때문에 바인딩은 대시보드에서):
 - **Workers & Pages → 프로젝트(northstar-note) → Settings → Functions → D1 database bindings**:
   변수명 `DB` → `northstar-subscribers` 연결
-- **Settings → Environment variables**: `ADMIN_KEY` = 원하는 열람용 비밀번호
+- **Settings → Environment variables**: `ADMIN_KEY` 를 **암호화 Secret(Encrypt)** 으로 추가 (일반 plaintext 변수 ❌)
 
 > ⚠️ `wrangler.toml` 에 실제 `database_id` 를 하드코딩하지 마세요 — 잘못된 값이면 Pages 빌드가 실패합니다. 바인딩은 대시보드로.
+
+## ⚠️ 관리자 페이지가 아무 키나 401 날 때 (ADMIN_KEY 드롭 함정)
+
+`wrangler.toml` 에 `[[d1_databases]]` 블록이 있으면 Pages 가 설정을 **이 파일에서** 읽고
+대시보드의 **plaintext 환경변수를 무시**합니다. 그러면 plaintext 로 넣은 `ADMIN_KEY` 가
+조용히 사라져 `/admin` 이 **모든 키에 401** 을 냅니다. (구독 저장은 D1 바인딩이
+`wrangler.toml` 에 있으니 정상 — 그래서 "구독은 되는데 관리자만 깨짐" 증상.)
+
+- **고치는 법**: `ADMIN_KEY` 를 대시보드에서 **암호화 Secret** 으로 다시 추가 → Save → 재배포.
+  Secret 은 별도 저장이라 `wrangler.toml` 과 함께 있어도 적용됩니다.
+- **하지 말 것**: 이걸 고치겠다고 `wrangler.toml` 의 D1 블록을 지우지 마세요 —
+  DB 바인딩이 사라져 구독 폼이 깨집니다 (실제로 시도했다가 revert 된 이력 있음: `5267fc6` → `9037558`).
+- 진단 팁: `ADMIN_KEY` 미설정 시 `/admin` 은 이제 401 이 아니라 **503 "ADMIN_KEY not configured"** 를
+  반환하므로, 401 이면 "키 틀림", 503 이면 "서버에 키 없음" 으로 즉시 구분됩니다.
 
 ## 확인
 - 구독자 보기: `https://<도메인>/admin?key=<ADMIN_KEY>`
