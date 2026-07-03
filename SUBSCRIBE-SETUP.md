@@ -37,9 +37,15 @@ wrangler d1 execute northstar-subscribers --remote --file=./schema.sql
 - 진단 팁: `ADMIN_KEY` 미설정 시 `/admin` 은 이제 401 이 아니라 **503 "ADMIN_KEY not configured"** 를
   반환하므로, 401 이면 "키 틀림", 503 이면 "서버에 키 없음" 으로 즉시 구분됩니다.
 
-## 확인
-- 구독자 보기: `https://<도메인>/admin?key=<ADMIN_KEY>`
-- CSV: `https://<도메인>/admin?key=<ADMIN_KEY>&format=csv`
+## 관리자 페이지 (구독자 열람)
+
+라이브 도메인은 `northstar-note.pages.dev` 입니다. `<ADMIN_KEY>` 자리에 대시보드에 넣은
+Secret 값을 넣어 접속하세요 (아래 링크의 `<ADMIN_KEY>` 는 자리표시자 — 실제 키를 리포에 커밋하지 말 것).
+
+- 구독자 보기: [`https://northstar-note.pages.dev/admin?key=<ADMIN_KEY>`](https://northstar-note.pages.dev/admin?key=<ADMIN_KEY>)
+- CSV 내려받기: [`https://northstar-note.pages.dev/admin?key=<ADMIN_KEY>&format=csv`](https://northstar-note.pages.dev/admin?key=<ADMIN_KEY>&format=csv)
+
+> 응답으로 상태 확인: 정상 키 → 200(표) · 틀린 키 → 401 · 서버에 키 미설정 → 503.
 
 ## 잠긴 글 나중에 공개하기
 №002·№003 은 잠금 화면으로 대체돼 있고, 원문은 각 폴더의 `full.html` 로 보존됨.
