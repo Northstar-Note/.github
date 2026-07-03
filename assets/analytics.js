@@ -33,11 +33,10 @@
       ga('event', 'contact_click', { email: href.slice(7).split('?')[0], page_path: path });
       return;
     }
-    // in-page anchor (subscribe intent)
-    if (href.charAt(0) === '#') {
-      if (href === '#subscribe') ga('event', 'subscribe_intent', { link_text: text, page_path: path });
-      return;
-    }
+    // subscribe intent (any link resolving to #subscribe, incl. ../ ../../ prefixes)
+    try { if (new URL(href, location.href).hash === '#subscribe') { ga('event', 'subscribe_intent', { link_text: text, page_path: path }); return; } } catch (e) {}
+    // other pure in-page anchors → ignore
+    if (href.charAt(0) === '#') return;
     var sameHost = a.host && a.host === location.host;
     // issue read
     if (sameHost && /\/issues\/[^/]+\/?$/.test(a.pathname)) {
