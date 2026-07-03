@@ -28,6 +28,10 @@ img{display:block; max-width:100%;}
 .nav .links a:not(.no)::after{content:""; position:absolute; left:0; bottom:-5px; width:0; height:1px; background:var(--ink); transition:width .3s cubic-bezier(.2,.7,.2,1);}
 .nav .links a:hover{color:var(--ink);} .nav .links a:not(.no):hover::after{width:100%;}
 .nav .links .no{color:var(--faint);}
+.nav .lang{display:inline-flex; align-items:center; gap:7px; padding-left:20px; margin-left:-6px; border-left:1px solid var(--line); font-size:12.5px; letter-spacing:.02em;}
+.nav .lang a{color:var(--faint);} .nav .lang a:hover{color:var(--ink);}
+.nav .lang .on{color:var(--ink); font-weight:600;}
+.nav .lang .sep{color:var(--line);}
 
 /* section head */
 .shead{border-top:1px solid var(--line); padding-top:18px; margin:clamp(60px,10vh,120px) 0 clamp(24px,4vh,38px); display:flex; justify-content:space-between; align-items:baseline; gap:16px;}
