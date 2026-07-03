@@ -3,11 +3,9 @@ name = "northstar-note"
 pages_build_output_dir = "."
 compatibility_date = "2026-07-03"
 
-# NOTE: D1 binding "DB" and secret "ADMIN_KEY" are configured in the
-# Cloudflare dashboard (Workers & Pages → project → Settings), NOT here —
-# a placeholder database_id would fail the Pages build. See SUBSCRIBE-SETUP.md.
-
-[[d1_databases]]
-binding = "DB"
-database_name = "northstar-subscribers"
-database_id = "b231c7f9-2fbf-4250-b94e-41b5a6346238"
+# NOTE: D1 binding "DB" and plaintext var "ADMIN_KEY" are configured in the
+# Cloudflare dashboard (Workers & Pages → project → Settings), NOT here.
+# IMPORTANT: keep all bindings/vars in the dashboard, none here. If a
+# [[d1_databases]] block lives in this file, Pages reads config from here and
+# IGNORES dashboard plaintext env vars — which silently drops ADMIN_KEY and
+# breaks /admin (401 for every key). See SUBSCRIBE-SETUP.md.
