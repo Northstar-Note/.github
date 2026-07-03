@@ -1,0 +1,11 @@
+# Cloudflare Pages + Functions config for the newsletter site.
+name = "solopreneur-northstar-note"
+pages_build_output_dir = "."
+compatibility_date = "2026-07-03"
+
+# D1 database that stores newsletter subscribers.
+# database_id 는 `wrangler d1 create northstar-subscribers` 실행 후 출력값으로 채우세요.
+[[d1_databases]]
+binding = "DB"
+database_name = "northstar-subscribers"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
