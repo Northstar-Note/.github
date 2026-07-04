@@ -40,6 +40,7 @@
   --font-logo:'Ria Sans','Pretendard Variable',Pretendard,sans-serif;
   --font-display:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,Roboto,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
   --font-body:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,Roboto,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  --font-serif:'Maru Buri','Pretendard Variable',serif; /* 카드 제목 세리프 (KO·EN) */
 
   /* radius */
   --r-card:20px;
@@ -186,24 +187,28 @@ html[lang="en"] .nav .brand{font-size:clamp(24px,2.6vw,30px); line-height:1.12;}
 /* ── home: hero ── */
 .hero{
   display:grid; grid-template-columns:1fr; gap:clamp(28px,5vw,44px);
-  padding:clamp(36px,7vh,84px) 0 clamp(44px,8vh,96px); align-items:center;
+  padding:clamp(2px,0.6vh,10px) 0 clamp(44px,8vh,96px);
+  align-items:center;
 }
 .hero h1{
   font-family:var(--font-display); font-weight:300; color:var(--pine);
-  font-size:clamp(22px,5.8vw,28px); line-height:1.55; letter-spacing:-.02em;
+  font-size:clamp(26px,6vw,35px); line-height:1.5; letter-spacing:-.025em;
+  max-width:24ch;
 }
 .hero .lead p{margin:16px 0 0; max-width:34ch; font-weight:300; font-size:clamp(22px,5.8vw,28px); color:var(--pine-soft); line-height:1.55; letter-spacing:-.02em;}
+.hero-cta{margin-top:clamp(24px,4vh,36px); align-self:flex-start;}
 
 /* cover card — 창간호 #001 · 좌: 텍스트 / 우중앙: 손그림 스케치 */
 .cover{
   position:relative; overflow:hidden;
-  display:flex; align-items:center; gap:clamp(12px,3vw,30px);
+  display:flex; flex-direction:column; align-items:flex-start; gap:clamp(16px,3vw,22px);
   background:var(--snow); border-radius:var(--r-hero);
-  padding:clamp(24px,6vw,44px); min-height:clamp(240px,58vw,340px);
+  padding:clamp(18px,4.5vw,26px);
 }
 .cover .cover-body{
-  flex:1 1 auto; min-width:0;
+  width:100%; min-width:0;
   display:flex; flex-direction:column; align-items:flex-start;
+  padding:0 clamp(4px,1.5vw,10px) clamp(4px,1.5vw,8px);
 }
 .cover .cover-kicker{
   display:block; margin-bottom:12px;
@@ -211,8 +216,8 @@ html[lang="en"] .nav .brand{font-size:clamp(24px,2.6vw,30px); line-height:1.12;}
   color:var(--paint); font-feature-settings:"tnum" 1;
 }
 .cover .ttl{
-  font-family:var(--font-display); font-weight:400;
-  font-size:clamp(21px,5.2vw,29px); line-height:1.3; letter-spacing:-.02em;
+  font-family:var(--font-serif); font-weight:600;
+  font-size:clamp(21px,5.2vw,29px); line-height:1.3; letter-spacing:-.03em;
 }
 .cover .cover-btn{
   display:inline-flex; align-items:center; gap:8px; margin-top:22px;
@@ -225,10 +230,19 @@ html[lang="en"] .nav .brand{font-size:clamp(24px,2.6vw,30px); line-height:1.12;}
 .cover .cover-btn .a{transition:transform .25s ease;}
 .cover:hover .cover-btn .a{transform:translateX(4px);}
 .cover .cover-art{
-  flex:none; align-self:center;
-  width:clamp(132px,42%,290px); height:auto;
+  width:100%; height:auto; aspect-ratio:4/3; object-fit:contain;
+  background:var(--snow); border-radius:calc(var(--r-hero) - 14px);
   pointer-events:none; user-select:none;
 }
+.cover .cover-note{margin-top:clamp(14px,2.5vw,18px); font-size:13.5px; color:var(--muted); letter-spacing:-.01em;}
+/* 비활성 '공개 준비 중' pill (단일) — 발간 시 이 자리가 검정 '전문 읽기' 버튼으로 활성화됨 */
+.cover .cover-soon{
+  display:inline-flex; align-items:center; gap:7px; margin-top:clamp(14px,2.5vw,18px);
+  background:var(--ghost); color:var(--paint);
+  font-size:13px; font-weight:600; letter-spacing:-.01em;
+  padding:11px 17px; border-radius:var(--r-card); cursor:default;
+}
+.cover .cover-soon svg{width:15px; height:15px; flex:none;}
 
 /* ── grid2: 다음 호 카드 ── */
 .grid2{display:grid; grid-template-columns:1fr; gap:clamp(16px,3vw,24px);}
@@ -238,7 +252,7 @@ html[lang="en"] .nav .brand{font-size:clamp(24px,2.6vw,30px); line-height:1.12;}
 }
 .card .chip{margin-bottom:16px;}
 .card .eyc{display:block; font-size:12px; font-weight:600; letter-spacing:.08em; color:var(--muted); margin-bottom:8px;}
-.card h3{font-family:var(--font-display); font-weight:500; font-size:clamp(18px,4.6vw,21px); line-height:1.4; letter-spacing:-.01em;}
+.card h3{font-family:var(--font-serif); font-weight:600; font-size:clamp(18px,4.6vw,21px); line-height:1.4; letter-spacing:-.02em;}
 .card .k{margin:12px 0 0; font-size:13.5px; color:var(--muted);}
 
 /* ── about (teaser + page) ── */
@@ -454,8 +468,8 @@ footer .flinks a:hover{color:var(--charcoal);}
 
 /* ── responsive: ≥1024px (hero 나란히 5:7) ── */
 @media(min-width:1024px){
-  .hero{grid-template-columns:5fr 7fr; gap:clamp(40px,4vw,64px); align-items:stretch;}
-  .hero .lead{display:flex; flex-direction:column; justify-content:flex-start; padding:6px 0;}
+  .hero{grid-template-columns:6fr 5fr; gap:clamp(40px,4vw,64px); align-items:center;}
+  .hero .lead{display:flex; flex-direction:column; justify-content:center; padding:6px 0;}
   .about{grid-template-columns:5fr 7fr; gap:clamp(40px,5vw,72px);}
   /* 창간의 변에 그림이 있을 때: h3=1열1행 · 본문=2열(두 행 걸침) · 그림=1열2행(h3 아래, 글 옆) */
   .about:has(figure){grid-template-rows:auto auto; row-gap:clamp(20px,2.4vw,32px);}
@@ -463,4 +477,12 @@ footer .flinks a:hover{color:var(--charcoal);}
   .about:has(figure)>.col{grid-column:2; grid-row:1 / span 2;}
   .about:has(figure)>figure{grid-column:1; grid-row:2; align-self:start; max-width:none;}
   footer .wrap{flex-direction:row; justify-content:space-between; align-items:center;}
+}
+
+/* ── mobile 여백 (2026-07-04) — 8pt grid + relationship spacing. base 뒤에 위치 ── */
+@media(max-width:719px){
+  .hero{gap:32px; padding-bottom:24px;}   /* CTA→카드: 별개 그룹 → 넓게(2×) */
+  .hero-cta{margin-top:16px;}             /* 문구→CTA: 한 팀 → 가깝게(1×) */
+  .shead{margin-top:48px;}                /* 섹션 간격 8pt 스냅 */
+  .cover{padding:24px;}                   /* 카드 내부 패딩 권장 24-32 하한으로 */
 }
