@@ -69,43 +69,52 @@ npx wrangler pages deploy . --project-name=solopreneur-northstar-note
 
 # 디자인 & 기여 가이드
 
-새 이슈를 **바이브 코딩(AI)으로 직접 만들어 PR**할 수 있게 정리했습니다. 핵심 원칙: **새 색·폰트·컴포넌트를 만들지 말고, 이미 있는 `assets/style.css`의 클래스만 재사용**합니다.
+새 이슈를 **바이브 코딩(AI)으로 직접 만들어 PR**할 수 있게 정리했습니다. 핵심 원칙: **새 색·폰트·컴포넌트를 만들지 말고, 이미 있는 `assets/style.css`의 클래스만 재사용**합니다. 디자인 시스템의 원리는 저장소 루트 `design.md`(Raus 스타일)와 아래를 따릅니다.
+
+컨셉: **"크림 종이 위에 찍힌 뉴스레터"** — 조용한 크림 캔버스 위에서 타이포가 일을 하고, 마리골드 구독 카드가 페이지의 유일한 외침이 됩니다.
 
 라이브 디자인 가이드(스와치·타이포·컴포넌트 실물): **https://northstar-note.pages.dev/guide/**
 
 ## 디자인 토큰 (`assets/style.css` `:root`)
 
-| 역할 | 값 |
-| --- | --- |
-| 캔버스(배경) | `#E7EAE3` |
-| 서피스/카드 | `#F1F3ED` |
-| 잉크(제목·본문) | `#282B26` |
-| 소프트(보조) | `#5F635B` |
-| 페인트(라벨·메타) | `#989C90` |
-| 헤어라인 | `#D6DACF` |
-| **세이지(강조 · 1색)** | `#4E5D51` |
-| 다크 패널(커버·밴드) | `#20261F → #151A14` (글자 `#E8EBE2`) |
+| 역할 | 토큰 | 값 |
+| --- | --- | --- |
+| 유일한 텍스트 색 · 헤어라인 · 다크 패널 | `--charcoal` | `#23212c` |
+| 크림 캔버스(모든 배경) | `--paper` | `#f7f0e1` |
+| 카드 서피스(크림 위 앞선 면) | `--snow` | `#ffffff` |
+| **Pine — 워드마크·h1·링크·킥커·role만** | `--pine` | `#006434` |
+| **Marigold — 구독 카드·칩·strong만** | `--marigold` | `#fcbd1c` |
+| Morning Sky — 홈 공지 바만 | `--morning-sky` | `#a6dfff` |
+| Ember — 공지 바 링크 밑줄 색만 | `--ember` | `#dd5000` |
 
-- 서체: **SUIT Variable** (CDN). 위계는 **크기·굵기·색만**으로. 세리프·모노 혼용 금지.
-- 강조는 **세이지 한 색만**. 그라데이션·형광·다색·그림자 남용 금지.
-- 전역 `word-break: keep-all`. 얇은 **1px 헤어라인**이 유일한 구조선. 필름 그레인(opacity .045)로 촉감.
-- 모서리: 커버 24 / 카드 20 / 아바타 원.
+파생: `--muted` rgba(35,33,44,.64) · `--paint` .45 · `--hair` .14 · `--hair-2` .35(인풋) · `--ghost` .06(고스트 숫자) · `--mari-hl` rgba(252,189,28,.45)(하이라이터).
+
+- 서체: **워드마크(로고)만 `Ria Sans`(800, `assets/fonts/` 로컬 · 글리프 서브셋 10KB) · 대형 워드마크 clamp(26–40px), 제목·본문은 `Pretendard`(CDN)**. `--font-logo`(로고) / `--font-display`(제목=Pretendard) / `--font-body`(본문).
+  - Ria Sans는 **오직 워드마크(로고)에만**. 제목(h1~h3·고스트 숫자·풀쿼트·강령 번호)·본문·메타·버튼·폼은 모두 **Pretendard(250~700)**. 타이포 보이스(Raus 300 속삭임): 대형 디스플레이 **300** · 섹션·커버·풀쿼트 **400** · 카드·멤버 소형 제목 **500** · 고스트·강령 숫자 **200–250** · eyebrow·메타 500–600 · 버튼·CTA 600 · strong 700. **대형 제목을 800으로 두껍게 쓰지 않습니다** — 두께가 아니라 크기·여백으로 존재감. 폰트 파일이 워드마크 글리프 서브셋이라 **워드마크 문구를 바꾸면 재서브셋**해야 합니다.
+- **색 규율**: 텍스트는 Charcoal 하나. **Pine은 정체성에만**(버튼 배경·장식 금지), **Marigold는 서피스로만**(텍스트 색 금지). 새 hex 금지.
+- **그림자·그라데이션 전면 금지.** 깊이는 크림 위 스노우 레이어링 + radius로만.
+- 전역 `word-break: keep-all` + `overflow-wrap:break-word`. 좌정렬. 숫자 tnum.
+- 모서리: 카드 20 / 히어로·구독 카드 clamp(24,5vw,40) / 필 99 / 칩 12. 0~8px 각진 모서리 금지.
 
 ## 컴포넌트 치트시트 (클래스)
 
-- **레이아웃**: `.wrap`(max 1220) · `.article`(본문 720) · `.shead`(섹션 헤더) · `.grid2`(2칼럼)
-- **네비/브랜드**: `.nav` `.brand` `.brandmark`(북극성 별) / 푸터 `footer .b .fs .fk`
-- **커버**: `.cover`(다크 대형) · `.card .mini`(`.t1/.t2/.t3` 톤) · `.ghost`(edge로 흐르는 숫자) · `.eyc`
-- **이슈 본문**: `.imast`(← 목록/№) · `.ihead`(`.eyebrow` 킥커, `h1`, `.dek`, `.sub`) · `.art`(`.lede`, `p`) · `.spec`(`.cap`/`.r`/`dt`/`dd`) · `.pq`(풀쿼트) · `.band`(다크 패널) · `.author`(`.av`/`.rl`) · `.pager`
+- **레이아웃**: `.wrap`(max 1160) · `.article`(본문 680) · `.shead`(섹션 헤더) · `.grid2`(모바일1·≥720 2칼럼)
+- **네비/브랜드**: `.nav` `.brand` `.brandmark`(북극성 별, Pine) · `.links`(모바일서 텍스트링크 숨김) · `.cta`(구독 필) · `.lang`(KO|EN 필) / 푸터 `footer .b .fs .fk` · `.flinks`
+- **공지 바**: `.annbar .annbar-in`(홈만, morning-sky, 링크 밑줄=ember)
+- **홈**: `.hero .lead .foot` · `.cover`(스노우 · `.ghost` 잘리는 숫자 · `.chip` · `.ttl` · `.read`) · `.card`(`.chip`/`.eyc`/`h3`/`.k`)
+- **아티클**: `.imast`(← 목록/№) · `.ihead`(`.eyebrow` Pine 킥커, `h1`, `.dek`, `.sub`) · `.art`(`.lede`, `p`, `strong` 마리골드 하이라이트) · `.spec`(`.cap`/`.r`/`dt`/`dd`) · `.pq`(좌정렬 풀쿼트) · `.plate`(이미지) · `.band`(flat 차콜 패널) · `.author`(`.av`/`.rl`) · `.pager`(고스트 필)
 - **소개**: `.tenets .tenet .tn` · `.members .member .avatar .role .contact .mail-icon` · `.colophon`
-- **목록**: `.ilist .ientry .cov .txt`
-- **공통**: `.eyebrow`(라벨) · `.num`(thin 숫자) · `.link-underline` · `.rise`(진입 애니)
+- **목록**: `.ilist .ientry .cov`(스노우+`.chip`+`.ghost`) `.txt`
+- **구독**: `.subscribe`(마리골드) `.say` `.field`(언더라인 인풋) `.note` `.done` — **`#subscribe`/`#subForm` 및 인라인 JS는 로직 그대로 유지**
+- **게이트**: `.gate`(좌정렬, `.cta` 구독 유도)
+- **칩·필**: `.chip`(마리골드) · `.cta`(채운 차콜 필) · `.pill`(고스트 필)
+- **공통**: `.eyebrow`(라벨) · `.num`(Pretendard 800 숫자) · `.link-underline`(Pine) · `.rise`(진입 애니)
 
 ## 새 이슈 추가하기
 
-1. `templates/issue.html`을 복사해 **`issues/<slug>/index.html`**로 저장
+1. `templates/issue.html`을 복사해 **`issues/<slug>/full.html`**(본문) / **`index.html`**(게이트)로 저장
 2. 킥커·제목·데크·본문·글쓴이·이전/다음 링크 채우기
-3. **`index.html`**(이번 호/지난 호)과 **`issues/index.html`**에 카드 한 줄 추가, `№` 부여
+3. **`index.html`**(다음 호 예고)과 **`issues/index.html`**에 카드 한 줄 추가, `№` 부여
 4. 로컬 확인 → PR
 
 ### 바이브 코딩 프롬프트 (Claude 등에 그대로 붙여넣기)
@@ -114,26 +123,32 @@ npx wrangler pages deploy . --project-name=solopreneur-northstar-note
 너는 뉴스레터 《북극성과 시행착오 노트》의 새 이슈 페이지를 만든다.
 디자인은 이미 정해져 있다 — 새 색/폰트/컴포넌트를 만들지 말고,
 기존 assets/style.css의 클래스만 재사용한다.
-톤: 프리미엄·담담·미니멀 (세이지 뉴트럴 배경, SUIT 단일 서체,
-강조는 세이지 1색, 넉넉한 여백). 참고: https://northstar-note.pages.dev/guide/
-그리고 issues/issue-13to1/index.html 구조를 그대로 따른다.
+컨셉: "크림 종이 위에 찍힌 뉴스레터" — 크림(paper) 캔버스,
+워드마크(로고)만 Ria Sans, 제목·본문은 Pretendard.
+색 규율: 텍스트는 Charcoal 하나 / Pine은 워드마크·링크·킥커에만
+/ Marigold는 구독 카드·칩·strong 하이라이트 서피스로만.
+그림자·그라데이션 금지, 좌정렬, word-break:keep-all.
+참고: design.md(루트) + https://northstar-note.pages.dev/guide/
+구조는 issues/issue-13to1/full.html 을 그대로 따른다.
 
-만들 것: issues/<slug>/index.html
-- <head>: SUIT CDN + ../../assets/style.css + ../../assets/favicon.svg
-- nav(.brand + .brandmark 별, 링크: 소개/발행목록/№)
+만들 것: issues/<slug>/full.html
+- <head>: RiaSans preload(../../assets/fonts/…) + Pretendard CDN
+  + ../../assets/style.css + favicon + GA 스니펫 + OG/description 메타
+- nav(.brand + .brandmark 별, 링크: 소개/발행목록/.cta 구독)
 - .imast  (← 발행 목록 / № 00X)
-- .article > .ihead(.eyebrow 킥커, h1 제목, .dek 데크,
+- .article > .ihead(.eyebrow Pine 킥커, h1 제목, .dek 데크,
   .sub 글쓴이·날짜·읽기시간)
 - .art 본문: 첫 문단 .lede, 이후 <p>. 핵심 인용은
-  <blockquote class="pq"><p>…</p></blockquote>. 강조는 <strong>.
+  <blockquote class="pq"><p>…</p></blockquote>(좌정렬). 강조는 <strong>.
 - (선택) 스펙표 .spec / 강령 .tenets>.tenet(.tn 숫자) /
-  다크 다이어그램 .band (반드시 <div class="wrap">로 감싼다)
-- .author(.av 이니셜, .rl 역할, <p> 소개) + .pager(이전/다음)
-- footer(.b 슬로건)
+  일러 .plate / flat 밴드 .band (반드시 <div class="wrap">로 감싼다)
+- .author(.av 이니셜, .rl 역할, <p> 소개) + .pager(이전/다음 필)
+- footer(.b 슬로건 + .flinks)
 
 원고: [여기에 제목·킥커·본문·글쓴이 붙여넣기]
 
-금지: 새 색·폰트·라이브러리·그라데이션·이모지, 포모/과장/구루 화법.
+금지: 새 색·폰트·라이브러리·그라데이션·그림자·이모지,
+제목·본문에 Ria Sans(로고 전용), 중앙정렬, 포모/과장/구루 화법.
 결론 없으면 없는 대로. 경로는 상대경로. word-break:keep-all.
 ```
 

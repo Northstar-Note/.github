@@ -4,70 +4,76 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>북극성과 시행착오 노트</title>
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css">
+<meta name="description" content="솔로프리너 클럽의 격주 노트. 직접 해본 것만 적습니다 — 어떤 도구를 얼마 주고 썼고, 왜 생각대로 안 됐는지까지.">
+<meta name="theme-color" content="#a6dfff">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="북극성과 시행착오 노트">
+<meta property="og:title" content="북극성과 시행착오 노트">
+<meta property="og:description" content="직접 해본 것만 적습니다. 시행착오와 북극성의 빛을 있는 그대로 남기는, 느슨하게 연대한 사람들의 노트.">
+<meta property="og:url" content="https://northstar-note.pages.dev/">
+<meta property="og:image" content="https://northstar-note.pages.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="assets/fonts/RiaSans-ExtraBold.woff2">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-<!-- Google Analytics (GA4) -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=G-7FEEPBLP17"></script>\n<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-7FEEPBLP17");</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7FEEPBLP17"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-7FEEPBLP17");</script>
 </head>
 <body>
+
+<div class="annbar rise">
+  <span class="annbar-in">
+    <span>창간호를 준비하고 있어요</span>
+    <a href="#subscribe">미리 구독하기 →</a>
+  </span>
+</div>
 
 <div class="wrap">
 
   <header class="nav rise">
     <a href="./" class="brand"><svg class="brandmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 L13.7 10.3 L23 12 L13.7 13.7 L12 23 L10.3 13.7 L1 12 L10.3 10.3 Z" fill="currentColor"/></svg>북극성과 시행착오 노트</a>
-    <div class="links">
+    <nav class="links">
       <a href="about/">소개</a>
       <a href="issues/">발행 목록</a>
-      <a href="#subscribe">구독</a>
-      <a href="issues/" class="no">창간호</a>
-    </div>
+      <span class="lang-switch">
+        <a href="./" class="on" aria-current="true">KO</a>
+        <a href="en/">EN</a>
+      </span>
+    </nav>
   </header>
 
   <!-- HERO -->
   <section class="hero rise" style="animation-delay:.06s;">
     <div class="lead">
       <div class="top">
-        <span class="eyebrow">솔로프리너 클럽 · 격주 발행 · 창간호</span>
         <h1>반 발짝 먼저 걷는<br>사람들의 노트</h1>
-        <p>직접 해본 것만 적습니다. 어떤 도구를 얼마 주고 썼고, 무엇을 만들었고, 왜 생각대로 안 됐는지까지.</p>
+        <p>직접 해본 것만 적습니다.<br>어떤 도구를 얼마 주고 썼고, 왜 안 됐는지까지.</p>
       </div>
-      <div class="foot">서두르지 않습니다. 다만, 끝까지 만들어볼 뿐이에요.</div>
     </div>
 
-    <a class="cover locked" href="#subscribe">
-      <div class="ghost num">01</div>
-      <div class="lockbadge"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>창간호 · 곧 공개</div>
-      <div>
-        <div class="ttl">담당도 아닌 부서가 쓴 보고서가,<br>조용히 윗선으로 돌았다</div>
-        <span class="read">구독하고 먼저 받기 <span class="a">→</span></span>
+    <a class="cover" href="#subscribe">
+      <div class="cover-body">
+        <span class="cover-kicker">№ 001 · 곧 공개</span>
+        <div class="ttl">담당도 아닌 부서가 쓴 보고서가, 조용히 윗선으로 돌았다</div>
+        <span class="cover-btn">구독하고 먼저 받기 <span class="a">→</span></span>
       </div>
+      <img class="cover-art" src="assets/desk-sketch.png" width="900" height="675" alt="" aria-hidden="true" loading="lazy">
     </a>
   </section>
 
   <!-- UPCOMING -->
   <div class="shead"><h2>다음 호 예고</h2><a class="rt" href="issues/">발행 목록 →</a></div>
-  <section class="grid2">
-    <div class="card locked">
-      <div class="mini t2">
-        <div class="lockbadge"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>다음 호</div>
-        <div class="ghost num">02</div>
-        <span class="eyc">№ 002 · Andrew</span>
-      </div>
-      <div class="body">
-        <h3>강의를 하고 책을 썼지만, 나는 아직 ‘AI를 설명하는 사람’이었습니다</h3>
-        <p class="k">곧 공개 · 두 번째 이야기</p>
-      </div>
+  <section class="grid2 rise" style="animation-delay:.08s;">
+    <div class="card">
+      <span class="chip">곧 공개</span>
+      <span class="eyc">№ 002 · Andrew</span>
+      <h3>강의를 하고 책을 썼지만, 나는 아직 ‘AI를 설명하는 사람’이었습니다</h3>
     </div>
-    <div class="card locked">
-      <div class="mini t3">
-        <div class="lockbadge"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>다음 호</div>
-        <div class="ghost num">03</div>
-        <span class="eyc">№ 003 · 2026</span>
-      </div>
-      <div class="body">
-        <h3>13명을 모으려다, AI와 둘이 남았다</h3>
-        <p class="k">곧 공개 · 세 번째 이야기</p>
-      </div>
+    <div class="card">
+      <span class="chip">곧 공개</span>
+      <span class="eyc">№ 003 · 2026</span>
+      <h3>13명을 모으려다, AI와 둘이 남았다</h3>
     </div>
   </section>
 
@@ -76,8 +82,7 @@
   <section class="about">
     <h3>AI, 다시<br>작은 개인의 시대</h3>
     <div class="col">
-      <p>르네상스는 피렌체의 작은 공방에서 시작됐습니다. 한 사람이 그림을 그리다 기계를 설계하고 인체를 해부하던 시절. 분야가 잘게 나뉘고 전문화되면서, 작은 개인이 끼어들 자리는 점점 좁아졌습니다.</p>
-      <p>AI는 그 자리를 다시 흔들고 있습니다. 호언장담과 포모를 파는 목소리 대신, 우리는 느슨하게 연대해 직접 해보고, 시행착오와 북극성의 빛을 있는 그대로 적습니다. 그래서 이름을 《북극성과 시행착오 노트》라 지었습니다.</p>
+      <p>호언장담과 포모 대신 — 느슨하게 연대한 사람들이 직접 해보고, 시행착오와 북극성의 빛을 있는 그대로 적습니다.</p>
       <a class="link-underline" href="about/">창간의 변과 만드는 사람들</a>
     </div>
   </section>
@@ -87,7 +92,7 @@
     <div class="say">
       <span class="eyebrow">구독</span>
       <h2>창간호부터,<br>가장 먼저 받아보세요</h2>
-      <p>격주로 한 편. 직접 해본 이야기를 이메일로 조용히 보내드립니다. 광고도, 재촉도 없이.</p>
+      <p>격주로 한 편, 이메일로 조용히 보내드립니다. 광고도 재촉도 없이.</p>
     </div>
     <form id="subForm">
       <div class="field">
@@ -99,10 +104,10 @@
         <input id="sub-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
       </div>
       <button type="submit">구독하기</button>
-      <p class="note">보내주신 정보는 뉴스레터 발송에만 씁니다. 언제든 해지할 수 있어요.</p>
+      <p class="note">발송에만 쓰고, 언제든 해지할 수 있어요.</p>
     </form>
     <div class="done">
-      <p><strong>구독 신청이 접수됐습니다.</strong><br>창간호 소식부터 이메일로 보내드릴게요. 반 발짝 먼저, 함께 걸어요.</p>
+      <p><strong>구독 신청이 접수됐습니다.</strong><br>창간호가 열리면 가장 먼저 보내드릴게요.</p>
     </div>
   </section>
 
@@ -133,6 +138,11 @@
       <p class="fs">Spectators predict. We prove.</p>
       <p class="fk">구경꾼은 예측하고, 우리는 증명한다 · No rush, no hype.</p>
     </div>
+    <nav class="flinks">
+      <a href="about/">소개</a>
+      <a href="issues/">발행 목록</a>
+      <a href="#subscribe">구독</a>
+    </nav>
   </div>
 </footer>
 

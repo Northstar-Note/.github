@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <!--
-  이슈 템플릿 · 복사해서  issues/<slug>/index.html  로 저장하세요.
+  이슈 템플릿 · 복사해서  issues/<slug>/full.html  (본문) 또는  issues/<slug>/index.html  (게이트) 로 저장하세요.
   (경로가 ../../ 인 이유: 이 파일은 issues/<슬러그>/ 두 단계 아래에 놓입니다.)
   {{ }} 부분만 채우고, 필요 없는 블록(스펙표·강령·다크밴드)은 지우면 됩니다.
   새 색/폰트/컴포넌트를 만들지 말고 아래 클래스만 사용하세요.
+  워드마크(로고)만 'Ria Sans', 제목(h1~h3·고스트 숫자·강령 번호)·본문은 Pretendard 로 이미 스타일이 잡혀 있습니다.
 -->
 <html lang="ko">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{제목}} · № {{번호}}</title>
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css">
+<meta name="description" content="{{한두 문장 요약(데크)}}">
+<meta name="theme-color" content="#f7f0e1">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="북극성과 시행착오 노트">
+<meta property="og:title" content="{{제목}} · № {{번호}}">
+<meta property="og:description" content="{{한두 문장 요약(데크)}}">
+<meta property="og:url" content="https://northstar-note.pages.dev/issues/{{slug}}/full.html">
+<meta property="og:image" content="https://northstar-note.pages.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../assets/fonts/RiaSans-ExtraBold.woff2">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="../../assets/style.css">
 <link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7FEEPBLP17"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-7FEEPBLP17");</script>
 </head>
 <body>
 
@@ -20,11 +33,10 @@
 
   <header class="nav rise">
     <a href="../../" class="brand"><svg class="brandmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 L13.7 10.3 L23 12 L13.7 13.7 L12 23 L10.3 13.7 L1 12 L10.3 10.3 Z" fill="currentColor"/></svg>북극성과 시행착오 노트</a>
-    <div class="links">
+    <nav class="links">
       <a href="../../about/">소개</a>
       <a href="../">발행 목록</a>
-      <a href="../" class="no">№ {{최신번호}}</a>
-    </div>
+    </nav>
   </header>
 
   <div class="imast">
@@ -55,16 +67,22 @@
         <div class="r"><dt>{{항목}}</dt><dd>{{값}}</dd></div>
       </dl>
 
+      <!-- 원본 일러스트 (선택) -->
+      <figure class="plate">
+        <img src="../../assets/{{이미지}}.png" alt="{{대체 텍스트}}" loading="lazy">
+        <figcaption>{{캡션}}</figcaption>
+      </figure>
+
       <p>{{본문 문단}}</p>
     </article>
   </div>
 
-  <!-- 다크 다이어그램/강조 (선택) · 반드시 .wrap 으로 감쌀 것 -->
+  <!-- 다크 밴드 (선택) · flat charcoal 패널 · 반드시 .wrap 으로 감쌀 것 -->
   <div class="wrap">
   <section class="band">
     <div class="inner">
       <div class="lab">{{라벨 · English label}}</div>
-      <p style="margin:0; color:var(--panel-tx); font-size:clamp(20px,2.6vw,30px); font-weight:500; line-height:1.4; letter-spacing:-.02em;">{{강조 문장 또는 인라인 SVG 다이어그램}}</p>
+      <p style="margin:0; color:var(--snow); font-family:var(--font-display); font-weight:800; font-size:clamp(20px,5vw,28px); line-height:1.4; letter-spacing:-.01em;">{{강조 문장}}</p>
     </div>
   </section>
   </div>
@@ -102,8 +120,14 @@
       <p class="fs">Spectators predict. We prove.</p>
       <p class="fk">서두르지 않습니다. 다만, 끝까지 만들어볼 뿐이에요.</p>
     </div>
+    <nav class="flinks">
+      <a href="../../about/">소개</a>
+      <a href="../">발행 목록</a>
+      <a href="../../#subscribe">구독</a>
+    </nav>
   </div>
 </footer>
 
+<script defer src="../../assets/analytics.js"></script>
 </body>
 </html>

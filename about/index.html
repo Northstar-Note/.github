@@ -4,10 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>소개 · 북극성과 시행착오 노트</title>
-<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css">
+<meta name="description" content="직접 해본 것을 담담하게 적는, 느슨하게 연대한 사람들의 노트. 과장도 조급함도 없이, 시행착오와 북극성의 빛을 있는 그대로 남깁니다.">
+<meta name="theme-color" content="#f7f0e1">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="북극성과 시행착오 노트">
+<meta property="og:title" content="소개 · 북극성과 시행착오 노트">
+<meta property="og:description" content="직접 해본 것을 담담하게 적는, 느슨하게 연대한 사람들의 노트. 우리가 시작한 이유와 만드는 사람들.">
+<meta property="og:url" content="https://northstar-note.pages.dev/about/">
+<meta property="og:image" content="https://northstar-note.pages.dev/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../assets/fonts/RiaSans-ExtraBold.woff2">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-<!-- Google Analytics (GA4) -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=G-7FEEPBLP17"></script>\n<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-7FEEPBLP17");</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7FEEPBLP17"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-7FEEPBLP17");</script>
 </head>
 <body>
 
@@ -15,13 +26,14 @@
 
   <header class="nav rise">
     <a href="../" class="brand"><svg class="brandmark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1 L13.7 10.3 L23 12 L13.7 13.7 L12 23 L10.3 13.7 L1 12 L10.3 10.3 Z" fill="currentColor"/></svg>북극성과 시행착오 노트</a>
-    <div class="links">
+    <nav class="links">
       <a href="./">소개</a>
       <a href="../issues/">발행 목록</a>
-      <a href="#subscribe">구독</a>
-      <a href="../issues/" class="no">№ 003</a>
-      <span class="lang"><span class="on">KO</span><span class="sep">|</span><a href="en/">EN</a></span>
-    </div>
+      <span class="lang-switch">
+        <a href="./" class="on" aria-current="true">KO</a>
+        <a href="en/">EN</a>
+      </span>
+    </nav>
   </header>
 
   <!-- PAGE HEADER -->
@@ -41,6 +53,9 @@
       <p>AI는 그 자리를 다시 흔들고 있습니다. 도전하고 실패하고 다시 길을 찾는 동안, 주변엔 호언장담과 포모를 파는 목소리가 많았지만 그들이 말한 대로 되지는 않았습니다. 그래서 우리는 코파운딩이 아니라, 그냥 함께 느슨하게 연대해 보기로 했습니다. 회사도 조합도 아닌, 새로운 협력의 한 모습일지 모릅니다.</p>
       <p>다시, 작은 개인의 시대. 느슨하게 연대한 우리가 그 길을 걷고, 시행착오와 북극성의 빛을 적습니다. 그래서 이름을 《북극성과 시행착오 노트》라 지었습니다.</p>
     </div>
+    <figure>
+      <img src="../assets/about-firenze.jpg" width="967" height="705" alt="피렌체 풍경 수채 일러스트 — 두오모와 베키오 다리, 아르노 강" loading="lazy">
+    </figure>
   </section>
 
   <!-- §2 우리가 지키려는 것들 -->
@@ -78,7 +93,7 @@
     <div class="say">
       <span class="eyebrow">구독</span>
       <h2>창간호부터,<br>가장 먼저 받아보세요</h2>
-      <p>격주로 한 편. 직접 해본 이야기를 이메일로 조용히 보내드립니다. 광고도, 재촉도 없이.</p>
+      <p>격주로 한 편, 이메일로 조용히 보내드립니다. 광고도 재촉도 없이.</p>
     </div>
     <form id="subForm">
       <div class="field">
@@ -90,10 +105,10 @@
         <input id="sub-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
       </div>
       <button type="submit">구독하기</button>
-      <p class="note">보내주신 정보는 뉴스레터 발송에만 씁니다. 언제든 해지할 수 있어요.</p>
+      <p class="note">발송에만 쓰고, 언제든 해지할 수 있어요.</p>
     </form>
     <div class="done">
-      <p><strong>구독 신청이 접수됐습니다.</strong><br>창간호 소식부터 이메일로 보내드릴게요. 반 발짝 먼저, 함께 걸어요.</p>
+      <p><strong>구독 신청이 접수됐습니다.</strong><br>창간호가 열리면 가장 먼저 보내드릴게요.</p>
     </div>
   </section>
 
@@ -124,6 +139,12 @@
       <p class="fs">Spectators predict. We prove.</p>
       <p class="fk">구경꾼은 예측하고, 우리는 증명한다 · No rush, no hype.</p>
     </div>
+    <nav class="flinks">
+      <a href="./">소개</a>
+      <a href="../issues/">발행 목록</a>
+      <a href="#subscribe">구독</a>
+      <a href="en/">EN</a>
+    </nav>
   </div>
 </footer>
 
