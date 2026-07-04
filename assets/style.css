@@ -326,7 +326,7 @@ html[lang="en"] .nav .brand{font-size:clamp(24px,2.6vw,30px); line-height:1.12;}
   font-size:clamp(140px,34vw,220px); line-height:.8; color:var(--ghost);
 }
 .ientry .txt .eyebrow{display:block; margin-bottom:12px; color:var(--pine);}
-.ientry .txt h3{font-family:var(--font-display); font-weight:400; font-size:clamp(21px,5.4vw,28px); line-height:1.32; letter-spacing:-.02em;}
+.ientry .txt h3{font-family:var(--font-serif); font-weight:600; font-size:clamp(21px,5.4vw,28px); line-height:1.32; letter-spacing:-.03em;}
 .ientry .txt p{margin:14px 0 0; max-width:52ch; font-size:15px; color:var(--muted); line-height:1.85;}
 .ientry .txt .read{display:inline-block; margin-top:16px; font-size:13.5px; font-weight:600; color:var(--muted);}
 .ientry .txt a.read{color:var(--pine); border-bottom:1.5px solid var(--pine); padding-bottom:2px;}
@@ -345,7 +345,7 @@ html[lang="en"] .nav .brand{font-size:clamp(24px,2.6vw,30px); line-height:1.12;}
 .article{max-width:var(--measure); margin:0 auto;}
 .ihead{padding:clamp(30px,5vh,56px) 0 clamp(26px,4vh,44px); border-bottom:1px solid var(--hair);}
 .ihead .eyebrow{display:block; margin-bottom:18px; color:var(--pine);}
-.ihead h1{font-family:var(--font-display); font-weight:300; font-size:clamp(28px,7.4vw,46px); line-height:1.2; letter-spacing:-.035em;}
+.ihead h1{font-family:var(--font-serif); font-weight:600; font-size:clamp(28px,7.4vw,46px); line-height:1.22; letter-spacing:-.04em;}
 .ihead .dek{margin:22px 0 0; font-size:clamp(17px,2vw,19px); color:var(--muted); line-height:1.75;}
 .ihead .sub{margin:22px 0 0; display:flex; gap:14px; flex-wrap:wrap; font-size:13px; color:var(--paint);}
 .art{padding:clamp(36px,6vh,60px) 0 0;}
