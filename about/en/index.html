@@ -41,23 +41,23 @@
     <span class="eyebrow">About · Praefatio</span>
     <h1>Why we started</h1>
     <p>Notes from a loosely bound group of people who write down only what they have done themselves — plainly, without exaggeration or hurry. Just the trial and error, and the light of the north star, as they are.</p>
-    <a class="cta phead-cta" href="#subscribe" data-open-subscribe aria-haspopup="dialog" aria-controls="subscribe-modal" aria-label="Open email-only subscription dialog">Subscribe <span class="a">→</span></a>
+    <a class="cta phead-cta" href="#subscribe" data-open-subscribe aria-haspopup="dialog" aria-controls="subscribe-modal" aria-label="Open subscription dialog">Subscribe <span class="a">→</span></a>
   </header>
 
   <div class="sub-modal" id="subscribe-modal" aria-hidden="true">
     <div class="sub-modal__veil" data-close-subscribe></div>
-    <section class="sub-modal__panel" role="dialog" aria-modal="true" aria-labelledby="quick-sub-title">
+    <section class="sub-modal__panel" role="dialog" aria-modal="true" aria-label="Subscribe">
       <button class="sub-modal__close" type="button" data-close-subscribe aria-label="Close subscription dialog">×</button>
-      <span class="eyebrow">Subscribe</span>
-      <h2 id="quick-sub-title">Leave just your email,<br>then keep reading</h2>
-      <p>We’ll send issue №001 quietly when it opens. You can subscribe without a name.</p>
       <form class="quick-sub-form" id="quickSubForm">
         <div class="field">
+          <label for="quick-sub-name">Name</label>
+          <input id="quick-sub-name" name="name" type="text" autocomplete="name">
+        </div>
+        <div class="field">
           <label for="quick-sub-email">Email</label>
-          <input id="quick-sub-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+          <input id="quick-sub-email" name="email" type="email" autocomplete="email" required>
         </div>
         <button type="submit">Subscribe</button>
-        <p class="note">If the name is blank, future notes simply won’t use one.</p>
       </form>
       <div class="quick-done" tabindex="-1">
         <p><strong>Subscription received.</strong></p>
@@ -153,7 +153,7 @@
     if(!modal) return;
     lastFocus=document.activeElement;
     modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('modal-open');
-    var input=modal.querySelector('input[name="email"]'); if(input) setTimeout(function(){input.focus();},40);
+    var input=modal.querySelector('input'); if(input) setTimeout(function(){input.focus();},40);
     if(typeof window.gtag==='function')gtag('event','subscribe_modal_open',{page_path:location.pathname});
   }
   function closeModal(){
@@ -189,7 +189,7 @@
     modal.querySelectorAll('[data-close-subscribe]').forEach(function(el){el.addEventListener('click', closeModal);});
     document.addEventListener('keydown', function(e){if(e.key==='Escape' && modal.classList.contains('open')) closeModal(); else trapFocus(e);});
     var quick=document.getElementById('quickSubForm');
-    if(quick) quick.addEventListener('submit', function(e){e.preventDefault(); submitSubscribe(quick, modal, '');});
+    if(quick) quick.addEventListener('submit', function(e){e.preventDefault(); submitSubscribe(quick, modal);});
   }
   var f=document.getElementById('subForm'), sec=document.getElementById('subscribe');
   if(f && sec) f.addEventListener('submit', function(e){e.preventDefault(); submitSubscribe(f, sec);});

@@ -206,7 +206,7 @@ body.modal-open{overflow:hidden;}
   background:var(--ghost); color:var(--charcoal);
   font-family:inherit; font-size:24px; line-height:1; cursor:pointer;
 }
-.quick-sub-form{display:flex; flex-direction:column; gap:18px; margin-top:clamp(24px,4vh,34px);}
+.quick-sub-form{display:flex; flex-direction:column; gap:18px; margin-top:0;}
 .quick-sub-form .field{display:flex; flex-direction:column; gap:8px;}
 .quick-sub-form label{font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--charcoal);}
 .quick-sub-form input{
