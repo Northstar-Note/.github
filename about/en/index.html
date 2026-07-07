@@ -51,11 +51,11 @@
       <form class="quick-sub-form" id="quickSubForm">
         <div class="field">
           <label for="quick-sub-name">Name</label>
-          <input id="quick-sub-name" name="name" type="text" autocomplete="name">
+          <input id="quick-sub-name" name="name" type="text" placeholder="What should we call you" autocomplete="name">
         </div>
         <div class="field">
           <label for="quick-sub-email">Email</label>
-          <input id="quick-sub-email" name="email" type="email" autocomplete="email" required>
+          <input id="quick-sub-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
         </div>
         <button type="submit">Subscribe</button>
       </form>
@@ -147,10 +147,22 @@
     name:isKo?'이름':'Name',
     email:isKo?'이메일':'Email'
   };
-  var modal=document.getElementById('subscribe-modal'), opener=document.querySelector('[data-open-subscribe]'), lastFocus=null;
+  var modal=document.getElementById('subscribe-modal'), opener=document.querySelector('[data-open-subscribe]'), lastFocus=null, quickRun=0;
+  function resetQuickState(){
+    if(!modal) return;
+    quickRun++;
+    modal.classList.remove('sent');
+    var quick=document.getElementById('quickSubForm');
+    if(quick){
+      quick.reset();
+      var btn=quick.querySelector('button[type="submit"]');
+      if(btn){btn.disabled=false; btn.textContent=copy.submit;}
+    }
+  }
   function openModal(e){
     if(e) e.preventDefault();
     if(!modal) return;
+    resetQuickState();
     lastFocus=document.activeElement;
     modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('modal-open');
     var input=modal.querySelector('input'); if(input) setTimeout(function(){input.focus();},40);
@@ -158,18 +170,22 @@
   }
   function closeModal(){
     if(!modal) return;
+    var wasSent=modal.classList.contains('sent');
     modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-open');
+    if(wasSent) resetQuickState();
     if(lastFocus && typeof lastFocus.focus==='function') lastFocus.focus();
   }
   function submitSubscribe(form, successTarget, nameValue){
     var btn=form.querySelector('button[type="submit"]');
     var emailField=form.querySelector('input[name="email"]');
     var nameField=form.querySelector('input[name="name"]');
+    var isQuick=successTarget===modal, runId=isQuick?quickRun:null;
     var data={name:(nameValue!=null?nameValue:(nameField?nameField.value:'')).trim(), email:(emailField?emailField.value:'').trim()};
     btn.disabled=true; btn.textContent=copy.sending; if(typeof window.gtag==='function')gtag('event','subscribe_submit',{page_path:location.pathname,source:form.id||'subscribe'});
     fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
-      .then(function(r){ if(!r.ok) throw new Error('bad status '+r.status); successTarget.classList.add('sent'); if(typeof window.gtag==='function')gtag('event','subscribe_success',{method:'d1',source:form.id||'subscribe'}); var done=successTarget.querySelector('.quick-done,.done'); if(done && done.focus) done.focus(); })
+      .then(function(r){ if(!r.ok) throw new Error('bad status '+r.status); if(isQuick && (!modal.classList.contains('open') || runId!==quickRun)) return; successTarget.classList.add('sent'); if(typeof window.gtag==='function')gtag('event','subscribe_success',{method:'d1',source:form.id||'subscribe'}); var done=successTarget.querySelector('.quick-done,.done'); if(done && done.focus) done.focus(); })
       .catch(function(){
+        if(isQuick && (!modal.classList.contains('open') || runId!==quickRun)) return;
         btn.disabled=false; btn.textContent=copy.submit; if(typeof window.gtag==='function')gtag('event','subscribe_fallback',{method:'mailto',source:form.id||'subscribe'});
         var lines=[]; if(data.name) lines.push(copy.name+': '+data.name); lines.push(copy.email+': '+data.email);
         window.location.href='mailto:andrew.ytower@gmail.com?subject='+encodeURIComponent(copy.subject)+'&body='+encodeURIComponent(lines.join('\n'));
