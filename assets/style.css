@@ -229,8 +229,12 @@ body.modal-open{overflow:hidden;}
 .quick-done p{font-size:15.5px; color:var(--charcoal); line-height:1.85;}
 .quick-done strong{font-weight:700;}
 .quick-done .pill{margin-top:18px; background:var(--snow);}
+.sub-modal.sent .sub-modal__close,
+.sub-modal.sent .sub-modal__panel>.eyebrow,
+.sub-modal.sent .sub-modal__panel>h2,
+.sub-modal.sent .sub-modal__panel>p,
 .sub-modal.sent .quick-sub-form{display:none;}
-.sub-modal.sent .quick-done{display:block;}
+.sub-modal.sent .quick-done{display:block; margin-top:0;}
 @media(min-width:720px){
   .sub-modal{align-items:center; justify-items:center; padding:clamp(24px,5vw,64px);}
   .sub-modal__panel{max-width:460px; border-radius:var(--r-hero);}
