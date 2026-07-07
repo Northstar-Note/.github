@@ -183,6 +183,7 @@ html[lang="en"] .nav .brand{font-size:clamp(24px,2.6vw,30px); line-height:1.12;}
 .phead .eyebrow{display:block; margin-bottom:18px;}
 .phead h1{font-family:var(--font-display); font-weight:300; font-size:clamp(28px,7.4vw,46px); line-height:1.2; letter-spacing:-.035em;}
 .phead p{margin:22px 0 0; max-width:46ch; font-size:17px; color:var(--muted); line-height:1.75;}
+.phead .phead-cta{margin-top:clamp(22px,4vh,34px);}
 
 /* ── home: hero ── */
 .hero{
