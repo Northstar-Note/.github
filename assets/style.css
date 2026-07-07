@@ -87,6 +87,7 @@ h1,h2,h3,h4{margin:0;}
   background:var(--charcoal); color:var(--snow);
   font-size:14px; font-weight:600; letter-spacing:-.01em;
   padding:13px 22px; border-radius:var(--r-pill); min-height:44px;
+  border:0; font-family:inherit; cursor:pointer; text-decoration:none;
   transition:background .25s ease;
 }
 .cta .a{transition:transform .25s ease;}
@@ -184,6 +185,56 @@ html[lang="en"] .nav .brand{font-size:clamp(24px,2.6vw,30px); line-height:1.12;}
 .phead h1{font-family:var(--font-display); font-weight:300; font-size:clamp(28px,7.4vw,46px); line-height:1.2; letter-spacing:-.035em;}
 .phead p{margin:22px 0 0; max-width:46ch; font-size:17px; color:var(--muted); line-height:1.75;}
 .phead .phead-cta{margin-top:clamp(22px,4vh,34px);}
+
+/* ── quick subscribe modal (top about CTA) ── */
+body.modal-open{overflow:hidden;}
+.sub-modal{position:fixed; inset:0; z-index:30; display:none; align-items:end; padding:0;}
+.sub-modal.open{display:grid;}
+.sub-modal__veil{position:absolute; inset:0; background:rgba(35,33,44,.22);}
+.sub-modal__panel{
+  position:relative; width:100%; max-height:min(86vh,640px); overflow:auto;
+  background:var(--snow); color:var(--charcoal);
+  border-radius:var(--r-hero) var(--r-hero) 0 0;
+  padding:clamp(28px,7vw,44px); margin:0;
+}
+.sub-modal__panel .eyebrow{display:block; margin-bottom:16px; color:var(--pine);}
+.sub-modal__panel h2{font-family:var(--font-display); font-weight:300; font-size:clamp(24px,6.4vw,34px); line-height:1.24; letter-spacing:-.035em;}
+.sub-modal__panel p{margin:16px 0 0; max-width:34ch; font-size:15.5px; color:var(--muted); line-height:1.75;}
+.sub-modal__close{
+  position:absolute; top:18px; right:18px;
+  width:44px; height:44px; border:0; border-radius:var(--r-pill);
+  background:var(--ghost); color:var(--charcoal);
+  font-family:inherit; font-size:24px; line-height:1; cursor:pointer;
+}
+.quick-sub-form{display:flex; flex-direction:column; gap:18px; margin-top:clamp(24px,4vh,34px);}
+.quick-sub-form .field{display:flex; flex-direction:column; gap:8px;}
+.quick-sub-form label{font-size:11px; font-weight:700; letter-spacing:.1em; color:var(--charcoal);}
+.quick-sub-form input{
+  width:100%; font-family:inherit; font-size:16px; color:var(--charcoal);
+  padding:10px 2px; border:0; border-bottom:1.5px solid var(--hair-2);
+  background:transparent; border-radius:0; letter-spacing:-.01em;
+}
+.quick-sub-form input::placeholder{color:var(--place);}
+.quick-sub-form input:focus{outline:none; border-bottom:2px solid var(--charcoal);}
+.quick-sub-form button{
+  padding:15px 24px; border:0; cursor:pointer; width:100%;
+  background:var(--charcoal); color:var(--snow); border-radius:var(--r-cta);
+  font-family:inherit; font-size:16px; font-weight:600; letter-spacing:-.01em;
+  border-bottom:2px solid transparent; transition:border-color .2s ease;
+}
+.quick-sub-form button:hover{border-bottom-color:var(--pine);}
+.quick-sub-form button:disabled{opacity:.6; cursor:default;}
+.quick-sub-form .note{margin:0; font-size:12.5px; color:rgba(35,33,44,.65); line-height:1.7;}
+.quick-done{display:none; margin-top:clamp(24px,4vh,34px);}
+.quick-done p{font-size:15.5px; color:var(--charcoal); line-height:1.85;}
+.quick-done strong{font-weight:700;}
+.quick-done .pill{margin-top:18px; background:var(--snow);}
+.sub-modal.sent .quick-sub-form{display:none;}
+.sub-modal.sent .quick-done{display:block;}
+@media(min-width:720px){
+  .sub-modal{align-items:center; justify-items:center; padding:clamp(24px,5vw,64px);}
+  .sub-modal__panel{max-width:460px; border-radius:var(--r-hero);}
+}
 
 /* ── home: hero ── */
 .hero{
