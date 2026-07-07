@@ -41,8 +41,30 @@
     <span class="eyebrow">소개 · Praefatio</span>
     <h1>우리가 시작한 이유</h1>
     <p>직접 해본 것을 담담하게 적는, 느슨하게 연대한 사람들의 노트입니다. 과장도 조급함도 없이, 시행착오와 북극성의 빛을 있는 그대로 남깁니다.</p>
-    <a class="cta phead-cta" href="#subscribe" aria-label="구독 입력 폼으로 이동">구독하기 <span class="a">→</span></a>
+    <a class="cta phead-cta" href="#subscribe" data-open-subscribe aria-haspopup="dialog" aria-controls="subscribe-modal" aria-label="이메일만 입력하는 구독 창 열기">구독하기 <span class="a">→</span></a>
   </header>
+
+  <div class="sub-modal" id="subscribe-modal" aria-hidden="true">
+    <div class="sub-modal__veil" data-close-subscribe></div>
+    <section class="sub-modal__panel" role="dialog" aria-modal="true" aria-labelledby="quick-sub-title">
+      <button class="sub-modal__close" type="button" data-close-subscribe aria-label="구독 창 닫기">×</button>
+      <span class="eyebrow">구독</span>
+      <h2 id="quick-sub-title">이메일만 남기고,<br>계속 읽으세요</h2>
+      <p>창간호가 열리면 조용히 보내드릴게요. 이름 없이 신청해도 괜찮습니다.</p>
+      <form class="quick-sub-form" id="quickSubForm">
+        <div class="field">
+          <label for="quick-sub-email">이메일</label>
+          <input id="quick-sub-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <button type="submit">구독하기</button>
+        <p class="note">이름이 비어 있으면 이름 없이 발송됩니다.</p>
+      </form>
+      <div class="quick-done" tabindex="-1">
+        <p><strong>구독 신청이 접수됐습니다.</strong><br>이어서 읽으셔도 됩니다.</p>
+        <button type="button" class="pill" data-close-subscribe>계속 읽기</button>
+      </div>
+    </section>
+  </div>
 
   <!-- §1 창간의 변 -->
   <div class="shead"><h2>창간의 변</h2></div>
@@ -117,20 +139,60 @@
 
 <script>
 (function(){
-  var f=document.getElementById('subForm'), sec=document.getElementById('subscribe');
-  if(!f) return;
-  f.addEventListener('submit', function(e){
-    e.preventDefault();
-    var btn=f.querySelector('button'); btn.disabled=true; btn.textContent='보내는 중…'; if(typeof window.gtag==='function')gtag('event','subscribe_submit',{page_path:location.pathname});
-    var data={name:f.name.value.trim(), email:f.email.value.trim()};
+  var isKo=document.documentElement.lang!=='en';
+  var copy={
+    sending:isKo?'보내는 중…':'Sending…',
+    submit:isKo?'구독하기':'Subscribe',
+    subject:isKo?'북극성과 시행착오 노트 구독 신청':'North Star & Trial-and-Error Notes subscription',
+    name:isKo?'이름':'Name',
+    email:isKo?'이메일':'Email'
+  };
+  var modal=document.getElementById('subscribe-modal'), opener=document.querySelector('[data-open-subscribe]'), lastFocus=null;
+  function openModal(e){
+    if(e) e.preventDefault();
+    if(!modal) return;
+    lastFocus=document.activeElement;
+    modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('modal-open');
+    var input=modal.querySelector('input[name="email"]'); if(input) setTimeout(function(){input.focus();},40);
+    if(typeof window.gtag==='function')gtag('event','subscribe_modal_open',{page_path:location.pathname});
+  }
+  function closeModal(){
+    if(!modal) return;
+    modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); document.body.classList.remove('modal-open');
+    if(lastFocus && typeof lastFocus.focus==='function') lastFocus.focus();
+  }
+  function submitSubscribe(form, successTarget, nameValue){
+    var btn=form.querySelector('button[type="submit"]');
+    var emailField=form.querySelector('input[name="email"]');
+    var nameField=form.querySelector('input[name="name"]');
+    var data={name:(nameValue!=null?nameValue:(nameField?nameField.value:'')).trim(), email:(emailField?emailField.value:'').trim()};
+    btn.disabled=true; btn.textContent=copy.sending; if(typeof window.gtag==='function')gtag('event','subscribe_submit',{page_path:location.pathname,source:form.id||'subscribe'});
     fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
-      .then(function(r){ if(!r.ok) throw new Error('bad status '+r.status); sec.classList.add('sent'); if(typeof window.gtag==='function')gtag('event','subscribe_success',{method:'d1'}); })
+      .then(function(r){ if(!r.ok) throw new Error('bad status '+r.status); successTarget.classList.add('sent'); if(typeof window.gtag==='function')gtag('event','subscribe_success',{method:'d1',source:form.id||'subscribe'}); var done=successTarget.querySelector('.quick-done,.done'); if(done && done.focus) done.focus(); })
       .catch(function(){
-        // Backend not yet live — fall back to email so no subscriber is lost.
-        btn.disabled=false; btn.textContent='구독하기'; if(typeof window.gtag==='function')gtag('event','subscribe_fallback',{method:'mailto'});
-        window.location.href='mailto:andrew.ytower@gmail.com?subject='+encodeURIComponent('북극성과 시행착오 노트 구독 신청')+'&body='+encodeURIComponent('이름: '+data.name+'\n이메일: '+data.email);
+        btn.disabled=false; btn.textContent=copy.submit; if(typeof window.gtag==='function')gtag('event','subscribe_fallback',{method:'mailto',source:form.id||'subscribe'});
+        var lines=[]; if(data.name) lines.push(copy.name+': '+data.name); lines.push(copy.email+': '+data.email);
+        window.location.href='mailto:andrew.ytower@gmail.com?subject='+encodeURIComponent(copy.subject)+'&body='+encodeURIComponent(lines.join('\n'));
       });
-  });
+  }
+  function trapFocus(e){
+    if(!modal || !modal.classList.contains('open') || e.key!=='Tab') return;
+    var nodes=Array.prototype.slice.call(modal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'))
+      .filter(function(el){return el.offsetParent!==null || el===document.activeElement;});
+    if(!nodes.length){e.preventDefault(); return;}
+    var first=nodes[0], last=nodes[nodes.length-1];
+    if(e.shiftKey && document.activeElement===first){e.preventDefault(); last.focus();}
+    else if(!e.shiftKey && document.activeElement===last){e.preventDefault(); first.focus();}
+  }
+  if(opener) opener.addEventListener('click', openModal);
+  if(modal){
+    modal.querySelectorAll('[data-close-subscribe]').forEach(function(el){el.addEventListener('click', closeModal);});
+    document.addEventListener('keydown', function(e){if(e.key==='Escape' && modal.classList.contains('open')) closeModal(); else trapFocus(e);});
+    var quick=document.getElementById('quickSubForm');
+    if(quick) quick.addEventListener('submit', function(e){e.preventDefault(); submitSubscribe(quick, modal, '');});
+  }
+  var f=document.getElementById('subForm'), sec=document.getElementById('subscribe');
+  if(f && sec) f.addEventListener('submit', function(e){e.preventDefault(); submitSubscribe(f, sec);});
 })();
 </script>
 
