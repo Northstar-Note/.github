@@ -199,7 +199,10 @@ export async function onRequestGet({ request, env }) {
   .isubj{font-size:14px;margin-top:3px}
   .iprev{background:#f7f0e1}iframe{width:100%;height:500px;border:0;display:block}
   .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;align-items:center}
-  button{font:inherit;font-size:14px;font-weight:600;padding:11px 18px;border-radius:10px;border:1px solid var(--line);cursor:pointer}
+  button{font:inherit;font-size:14px;font-weight:600;padding:11px 18px;border-radius:10px;border:1px solid var(--line);cursor:pointer;white-space:nowrap;line-height:1.2}
+  .toitem{display:flex;gap:8px;margin-bottom:8px}.toitem input{flex:1}
+  .brem{background:#fff;color:var(--soft);padding:0 15px}
+  .badd{background:#fff;color:var(--accent);border-color:var(--line)}
   .btest{background:var(--surface);color:var(--ink)}
   .bsend{background:var(--accent);color:#fff;border-color:var(--accent)}
   .bsend:disabled{opacity:.4;cursor:not-allowed}
@@ -237,10 +240,13 @@ export async function onRequestGet({ request, env }) {
 
 <div class="card">
   <div class="ct">테스트 발송</div>
-  <label>받을 주소 (여러 개면 쉼표로 구분)</label>
-  <div class="test-row">
-    <input type="email" id="to" value="${esc(env.NEWSLETTER_SENDER || '')}" placeholder="you@example.com" multiple>
-    <button class="btest" onclick="doTest()">테스트 발송</button>
+  <label>받을 주소</label>
+  <div id="tolist">
+    <div class="toitem"><input type="email" class="toin" value="${esc(env.NEWSLETTER_SENDER || '')}" placeholder="you@example.com"><button class="brem" type="button" onclick="remTo(this)">×</button></div>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <button class="badd" type="button" onclick="addTo()">+ 주소 추가</button>
+    <button class="btest" type="button" onclick="doTest()">테스트 발송</button>
   </div>
   <div class="msg" id="tmsg"></div>
 </div>
@@ -253,16 +259,22 @@ export async function onRequestGet({ request, env }) {
 
 <script>
   var KEY=${JSON.stringify(key)}, SLUG=${JSON.stringify(slug)}, COUNT=${count}, NO=${JSON.stringify(issue.no)};
-  function post(action,msgId){
-    var to=(document.getElementById('to')||{}).value||'';
-    var b=new URLSearchParams({action:action,slug:SLUG,to:to});
+  function post(action,msgId,toVal){
+    var b=new URLSearchParams({action:action,slug:SLUG,to:toVal||''});
     var m=document.getElementById(msgId);m.className='msg';m.textContent='처리 중…';
     fetch('?key='+encodeURIComponent(KEY),{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:b})
       .then(function(r){return r.json();})
       .then(function(j){m.className='msg '+(j.ok?'ok':'err');m.textContent=j.message;if(j.ok&&(action==='schedule'||action==='cancel'))setTimeout(function(){location.reload();},1400);})
       .catch(function(e){m.className='msg err';m.textContent='오류: '+e;});
   }
-  function doTest(){post('test','tmsg');}
+  function addTo(){var d=document.createElement('div');d.className='toitem';d.innerHTML='<input type="email" class="toin" placeholder="you@example.com"><button class="brem" type="button" onclick="remTo(this)">×</button>';document.getElementById('tolist').appendChild(d);}
+  function remTo(b){var l=document.getElementById('tolist');if(l.children.length>1)b.parentNode.remove();}
+  function doTest(){
+    var to=[].slice.call(document.querySelectorAll('.toin')).map(function(i){return i.value.trim();}).filter(Boolean).join(',');
+    var m=document.getElementById('tmsg');
+    if(!to){m.className='msg err';m.textContent='받을 주소를 입력하세요';return;}
+    post('test','tmsg',to);
+  }
   function doApprove(){
     if(confirm('구독자 '+COUNT+'명에게 № '+NO+' 를 다음 10:00(KST)에 발송합니다.\\n승인하시겠어요?  (10시 전까진 취소 가능)')) post('schedule','msg');
   }
