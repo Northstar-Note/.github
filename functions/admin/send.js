@@ -162,7 +162,7 @@ export async function onRequestGet({ request, env }) {
   const senderSet = !!env.NEWSLETTER_SENDER && !!env.GMAIL_REFRESH_TOKEN;
 
   const opts = ISSUES.map((i) => {
-    const tag = sentSlugs.has(i.slug) ? ' (발송됨)' : sched[i.slug] ? ' (예약됨)' : '';
+    const tag = sentSlugs.has(i.slug) ? ' (발송됨)' : sched[i.slug] ? ' (승인됨)' : '';
     return `<option value="${i.slug}"${i.slug === slug ? ' selected' : ''}>№ ${i.no} · ${esc(i.title)}${tag}</option>`;
   }).join('');
 
@@ -170,15 +170,15 @@ export async function onRequestGet({ request, env }) {
   if (already) {
     actionBlock = `<div class="state ok">✅ 이미 발송 완료된 호입니다.</div>`;
   } else if (scheduledFor) {
-    actionBlock = `<div class="state warn">⏰ <b>${fmtKST(scheduledFor)}</b> 발송 예약됨.</div>
-      <div class="row"><button class="bcancel" onclick="post('cancel')">예약 취소</button></div>`;
+    actionBlock = `<div class="state ok">✅ 승인됨 — <b>${fmtKST(scheduledFor)}</b> 발송 예정.</div>
+      <div class="row"><button class="bcancel" onclick="post('cancel')">승인 취소</button></div>`;
   } else {
     actionBlock = `<div class="row">
-        <button class="bsend" ${senderSet ? '' : 'disabled'} onclick="document.getElementById('cf').classList.add('show')">전체 발송 예약…</button>
+        <button class="bsend" ${senderSet ? '' : 'disabled'} onclick="document.getElementById('cf').classList.add('show')">전체 발송 승인…</button>
       </div>
       <div class="confirm" id="cf">
-        <p>구독자 <b>${count}</b>명에게 № ${issue.no} 를 <b>다음 10:00(KST)</b>에 발송 예약합니다. 예약 후 10시 전까진 취소할 수 있어요.</p>
-        <button class="bapprove" onclick="post('schedule')">승인하고 예약</button>
+        <p>구독자 <b>${count}</b>명에게 № ${issue.no} 를 <b>다음 10:00(KST)</b>에 발송합니다. 승인 후 10시 전까진 취소할 수 있어요.</p>
+        <button class="bapprove" onclick="post('schedule')">승인</button>
       </div>`;
   }
 
@@ -323,12 +323,12 @@ export async function onRequestPost({ request, env }) {
       if (dup) return json({ ok: false, message: '이미 발송된 호' });
       const when = next10KST(Date.now()).toISOString();
       await env.DB.prepare("INSERT INTO schedule (slug,status,scheduled_for) VALUES (?,?,?) ON CONFLICT(slug) DO UPDATE SET status='scheduled', scheduled_for=excluded.scheduled_for").bind(slug, 'scheduled', when).run();
-      return json({ ok: true, message: `✅ ${fmtKST(when)} 발송 예약됨` });
+      return json({ ok: true, message: `✅ 승인됨 — ${fmtKST(when)} 발송 예정` });
     }
 
     if (action === 'cancel') {
       await env.DB.prepare("UPDATE schedule SET status='cancelled' WHERE slug=? AND status='scheduled'").bind(slug).run();
-      return json({ ok: true, message: '예약이 취소되었습니다' });
+      return json({ ok: true, message: '승인이 취소되었습니다' });
     }
 
     return json({ ok: false, message: '알 수 없는 action' });
