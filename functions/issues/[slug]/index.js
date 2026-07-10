@@ -17,8 +17,12 @@ export async function onRequestGet(ctx) {
   const slug = params.slug;
   if (!KNOWN.has(slug)) return next();
 
-  let sent = false;
-  if (env.DB) {
+  // 어드민 미리보기: ?key=ADMIN_KEY 면 발송 전에도 기사 확인 가능(공개엔 영향 없음)
+  const previewKey = new URL(request.url).searchParams.get('key');
+  const preview = !!env.ADMIN_KEY && previewKey && previewKey.trim() === String(env.ADMIN_KEY).trim();
+
+  let sent = preview;
+  if (!sent && env.DB) {
     try {
       const r = await env.DB.prepare('SELECT slug FROM sends WHERE slug=?').bind(slug).first();
       sent = !!r;
