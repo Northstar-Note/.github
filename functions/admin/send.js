@@ -1,11 +1,13 @@
 // GET  /admin/send?key=ADMIN_KEY[&slug=...]  — 발송 검토 페이지 (비번 게이트)
-// POST /admin/send?key=ADMIN_KEY              — action=test | send
-//   test : 발신 계정 자기 자신에게만 1통 (검토용)
-//   send : 전체 구독자에게 발송 (confirm=YES 필수 = 승인 클릭)
+// POST /admin/send?key=ADMIN_KEY  — action=test | schedule | cancel | run-due
+//   test     : 지정 주소로 1통 (검토용, to= 입력)
+//   schedule : 다음 10:00(KST) 발송 예약 (승인 클릭 = 예약)
+//   cancel   : 예약 취소
+//   run-due  : 예약시각 지난 건 전체 구독자에게 발송 (GitHub Actions 타이머가 호출)
 //
-// Secrets (Cloudflare Pages → Settings → env, Encrypt):
+// Secrets (Cloudflare Pages env, Encrypt):
 //   ADMIN_KEY, NEWSLETTER_SENDER, GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN
-// Binding: env.DB (D1)  ·  중복발송 방지: sends 테이블
+// Binding: env.DB (D1) · sends(중복차단) · schedule(예약)
 
 const SITE = 'https://northstar-note.pages.dev';
 const NEWSLETTER_NAME = '북극성과 시행착오 노트';
@@ -34,6 +36,20 @@ const nz = (s) => String(s).replace(/ — /g, ' - ').replace(/—/g, '-');
 const b64 = (str) => { const by = new TextEncoder().encode(str); let bin = ''; for (const b of by) bin += String.fromCharCode(b); return btoa(bin); };
 const b64url = (str) => b64(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const encWord = (s) => `=?UTF-8?B?${b64(s)}?=`;
+
+// 다음 10:00 KST(=01:00 UTC)의 UTC Date. 이미 지났으면 다음날.
+function next10KST(nowMs) {
+  const now = new Date(nowMs);
+  const kst = new Date(nowMs + 9 * 3600 * 1000); // KST 벽시계를 UTC 필드로
+  let t = Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate(), 1, 0, 0); // 10:00 KST
+  if (t <= now.getTime()) t += 24 * 3600 * 1000;
+  return new Date(t);
+}
+function fmtKST(iso) {
+  const d = new Date(new Date(iso).getTime() + 9 * 3600 * 1000);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${p(d.getUTCMonth() + 1)}/${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())} KST`;
+}
 
 function renderEmail(issue) {
   const url = `${SITE}/issues/${issue.slug}/`;
@@ -68,11 +84,11 @@ async function accessToken(env) {
   return j.access_token;
 }
 
-function buildRaw(sender, bcc, subject, plain, html) {
+function buildRaw(sender, to, bcc, subject, plain, html) {
   const B = 'np_' + Math.random().toString(36).slice(2);
   const msg =
     `From: ${encWord(NEWSLETTER_NAME)} <${sender}>\r\n` +
-    `To: ${sender}\r\n` +
+    `To: ${to}\r\n` +
     (bcc.length ? `Bcc: ${bcc.join(', ')}\r\n` : '') +
     `Subject: ${encWord(subject)}\r\n` +
     `MIME-Version: 1.0\r\n` +
@@ -83,8 +99,8 @@ function buildRaw(sender, bcc, subject, plain, html) {
   return b64url(msg);
 }
 
-async function gmailSend(env, token, bcc, subject, plain, html) {
-  const raw = buildRaw(env.NEWSLETTER_SENDER, bcc, subject, plain, html);
+async function gmailSend(env, token, to, bcc, subject, plain, html) {
+  const raw = buildRaw(env.NEWSLETTER_SENDER, to, bcc, subject, plain, html);
   const r = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
     method: 'POST',
     headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
@@ -93,6 +109,25 @@ async function gmailSend(env, token, bcc, subject, plain, html) {
   const j = await r.json();
   if (!r.ok) throw new Error('gmail send 실패: ' + (j.error?.message || r.status));
   return j.id;
+}
+
+async function ensureTables(env) {
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS sends (slug TEXT PRIMARY KEY, subject TEXT, recipients INTEGER, sent_at TEXT NOT NULL DEFAULT (datetime('now')))").run();
+  await env.DB.prepare("CREATE TABLE IF NOT EXISTS schedule (slug TEXT PRIMARY KEY, status TEXT NOT NULL, scheduled_for TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))").run();
+}
+
+async function sendToAll(env, token, issue) {
+  const { subject, html, plain } = renderEmail(issue);
+  const { results } = await env.DB.prepare('SELECT email FROM subscribers').all();
+  const emails = [...new Set((results || []).map((r) => (r.email || '').trim().toLowerCase()).filter((e) => e && e.includes('@')))];
+  if (!emails.length) throw new Error('구독자 0명');
+  let sent = 0;
+  for (let i = 0; i < emails.length; i += BCC_BATCH) {
+    await gmailSend(env, token, env.NEWSLETTER_SENDER, emails.slice(i, i + BCC_BATCH), subject, plain, html);
+    sent += Math.min(BCC_BATCH, emails.length - i);
+  }
+  await env.DB.prepare('INSERT OR IGNORE INTO sends (slug, subject, recipients) VALUES (?,?,?)').bind(issue.slug, subject, sent).run();
+  return sent;
 }
 
 function guard(env, key) {
@@ -106,96 +141,131 @@ export async function onRequestGet({ request, env }) {
   const key = url.searchParams.get('key') || '';
   const bad = guard(env, key); if (bad) return bad;
 
-  let count = 0, sentSlugs = new Set();
+  let count = 0, sentSlugs = new Set(), sched = {};
   if (env.DB) {
     try {
+      await ensureTables(env);
       const c = await env.DB.prepare('SELECT COUNT(*) AS n FROM subscribers').first();
       count = c?.n || 0;
-      await env.DB.prepare('CREATE TABLE IF NOT EXISTS sends (slug TEXT PRIMARY KEY, subject TEXT, recipients INTEGER, sent_at TEXT NOT NULL DEFAULT (datetime(\'now\')))').run();
-      const { results } = await env.DB.prepare('SELECT slug FROM sends').all();
-      sentSlugs = new Set((results || []).map((r) => r.slug));
+      const s1 = await env.DB.prepare('SELECT slug FROM sends').all();
+      sentSlugs = new Set((s1.results || []).map((r) => r.slug));
+      const s2 = await env.DB.prepare("SELECT slug, status, scheduled_for FROM schedule WHERE status='scheduled'").all();
+      (s2.results || []).forEach((r) => { sched[r.slug] = r.scheduled_for; });
     } catch (e) { /* 표시는 계속 */ }
   }
 
-  const slug = url.searchParams.get('slug') || (ISSUES.find((i) => !sentSlugs.has(i.slug)) || ISSUES[0]).slug;
+  const slug = url.searchParams.get('slug') || (ISSUES.find((i) => !sentSlugs.has(i.slug) && !sched[i.slug]) || ISSUES[0]).slug;
   const issue = ISSUES.find((i) => i.slug === slug) || ISSUES[0];
   const { subject, html } = renderEmail(issue);
   const already = sentSlugs.has(issue.slug);
+  const scheduledFor = sched[issue.slug];
   const senderSet = !!env.NEWSLETTER_SENDER && !!env.GMAIL_REFRESH_TOKEN;
 
-  const opts = ISSUES.map((i) => `<option value="${i.slug}"${i.slug === slug ? ' selected' : ''}>№ ${i.no} · ${esc(i.title)}${sentSlugs.has(i.slug) ? ' (발송됨)' : ''}</option>`).join('');
+  const opts = ISSUES.map((i) => {
+    const tag = sentSlugs.has(i.slug) ? ' (발송됨)' : sched[i.slug] ? ' (예약됨)' : '';
+    return `<option value="${i.slug}"${i.slug === slug ? ' selected' : ''}>№ ${i.no} · ${esc(i.title)}${tag}</option>`;
+  }).join('');
+
+  let actionBlock;
+  if (already) {
+    actionBlock = `<div class="state ok">✅ 이미 발송 완료된 호입니다.</div>`;
+  } else if (scheduledFor) {
+    actionBlock = `<div class="state warn">⏰ <b>${fmtKST(scheduledFor)}</b> 발송 예약됨.</div>
+      <div class="row"><button class="bcancel" onclick="post('cancel')">예약 취소</button></div>`;
+  } else {
+    actionBlock = `<div class="row">
+        <button class="bsend" ${senderSet ? '' : 'disabled'} onclick="document.getElementById('cf').classList.add('show')">전체 발송 예약…</button>
+      </div>
+      <div class="confirm" id="cf">
+        <p>구독자 <b>${count}</b>명에게 № ${issue.no} 를 <b>다음 10:00(KST)</b>에 발송 예약합니다. 예약 후 10시 전까진 취소할 수 있어요.</p>
+        <button class="bapprove" onclick="post('schedule')">승인하고 예약</button>
+      </div>`;
+  }
 
   const page = `<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>발송 · admin</title>
 <style>
   :root{--bg:#E7EAE3;--surface:#F1F3ED;--ink:#282B26;--soft:#5F635B;--line:#D6DACF;--accent:#4E5D51;--warn:#8a3b2e}
   *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'SUIT',sans-serif;line-height:1.6}
-  .wrap{max-width:900px;margin:0 auto;padding:40px 24px 80px}
+  .wrap{max-width:760px;margin:0 auto;padding:40px 24px 90px}
   h1{margin:0 0 4px;font-size:22px;font-weight:600;letter-spacing:-.02em}
   .sub{color:var(--soft);font-size:14px;margin-bottom:26px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:20px}
-  label{font-size:12px;letter-spacing:.06em;color:var(--soft);display:block;margin-bottom:8px}
-  select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:14px;color:var(--ink)}
-  .meta{display:flex;gap:22px;flex-wrap:wrap;font-size:14px;margin:14px 0 0}
-  .meta b{color:var(--accent)}
-  .prev{margin-top:10px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#f7f0e1}
-  iframe{width:100%;height:520px;border:0;display:block}
-  .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
-  button{font:inherit;font-size:14px;font-weight:600;padding:12px 20px;border-radius:10px;border:1px solid var(--line);cursor:pointer}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:18px}
+  .ct{font-size:12px;letter-spacing:.06em;color:var(--soft);margin-bottom:12px;font-weight:600}
+  label{font-size:12px;color:var(--soft);display:block;margin-bottom:7px}
+  select,input[type=email]{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:14px;color:var(--ink)}
+  .meta{display:flex;gap:20px;flex-wrap:wrap;font-size:14px;margin:14px 0 0}.meta b{color:var(--accent)}
+  .flag{font-size:12px;color:var(--warn)}
+  /* inbox mock */
+  .inbox{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+  .ihead{padding:13px 16px;border-bottom:1px solid var(--line);background:#fbfcf9}
+  .ifrom{font-size:13px;font-weight:600}.ifrom span{color:var(--soft);font-weight:400}
+  .isubj{font-size:14px;margin-top:3px}
+  .iprev{background:#f7f0e1}iframe{width:100%;height:500px;border:0;display:block}
+  .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;align-items:center}
+  button{font:inherit;font-size:14px;font-weight:600;padding:11px 18px;border-radius:10px;border:1px solid var(--line);cursor:pointer}
   .btest{background:var(--surface);color:var(--ink)}
   .bsend{background:var(--accent);color:#fff;border-color:var(--accent)}
   .bsend:disabled{opacity:.4;cursor:not-allowed}
+  .bcancel{background:#fff;color:var(--warn);border-color:var(--warn)}
   .confirm{margin-top:14px;padding:16px;border:1px solid var(--warn);border-radius:11px;background:#f7ece9;display:none}
-  .confirm.show{display:block}
-  .confirm p{margin:0 0 12px;color:var(--warn);font-size:14px}
+  .confirm.show{display:block}.confirm p{margin:0 0 12px;color:var(--warn);font-size:14px}
   .bapprove{background:var(--warn);color:#fff;border-color:var(--warn)}
-  .msg{margin-top:16px;font-size:14px;white-space:pre-wrap}
-  .ok{color:var(--accent)}.err{color:var(--warn)}
-  .flag{font-size:12px;color:var(--warn)}
+  .state{padding:13px 15px;border-radius:10px;font-size:14px;margin-bottom:8px}
+  .state.ok{background:#e9efe7;color:var(--accent)}.state.warn{background:#f7ece9;color:var(--warn)}
+  .msg{margin-top:14px;font-size:14px;white-space:pre-wrap}.msg.ok{color:var(--accent)}.msg.err{color:var(--warn)}
+  .test-row{display:flex;gap:10px;margin-top:4px}.test-row input{flex:1}
 </style></head><body><div class="wrap">
 <h1>${NEWSLETTER_NAME} · 발송</h1>
-<div class="sub">검토 후 발송. 전체 발송은 승인을 눌러야만 나갑니다.</div>
+<div class="sub">검토 → 테스트 → 승인. 승인하면 다음 10:00(KST)에 발송, 그 전까진 취소 가능.</div>
 
 <div class="card">
-  <label>발송할 호</label>
+  <div class="ct">발송할 호</div>
   <select id="slug" onchange="location.search='?key=${esc(key)}&slug='+this.value">${opts}</select>
   <div class="meta">
     <span>구독자 <b>${count}</b>명</span>
-    <span>제목: ${esc(subject)}</span>
-    ${already ? '<span class="flag">⚠ 이미 발송됨 — 재발송 차단</span>' : ''}
-    ${senderSet ? '' : '<span class="flag">⚠ 발신 시크릿 미설정 (CF Secrets 등록 필요)</span>'}
+    ${senderSet ? '' : '<span class="flag">⚠ 발신 시크릿 미설정 — CF 재배포 필요</span>'}
   </div>
 </div>
 
 <div class="card">
-  <label>이메일 미리보기</label>
-  <div class="prev"><iframe srcdoc="${esc(html)}"></iframe></div>
+  <div class="ct">이메일에서 이렇게 보입니다</div>
+  <div class="inbox">
+    <div class="ihead">
+      <div class="ifrom">${NEWSLETTER_NAME} <span>&lt;${esc(env.NEWSLETTER_SENDER || 'sender')}&gt;</span></div>
+      <div class="isubj">${esc(subject)}</div>
+    </div>
+    <div class="iprev"><iframe srcdoc="${esc(html)}"></iframe></div>
+  </div>
 </div>
 
 <div class="card">
-  <div class="row">
-    <button class="btest" onclick="doTest()">내게 테스트 발송</button>
-    <button class="bsend" ${already ? 'disabled' : ''} onclick="document.getElementById('cf').classList.add('show')">전체 발송…</button>
+  <div class="ct">테스트 발송</div>
+  <label>받을 주소 (여러 개면 쉼표로 구분)</label>
+  <div class="test-row">
+    <input type="email" id="to" value="${esc(env.NEWSLETTER_SENDER || '')}" placeholder="you@example.com" multiple>
+    <button class="btest" onclick="doTest()">테스트 발송</button>
   </div>
-  <div class="confirm" id="cf">
-    <p>구독자 <b>${count}</b>명 전원에게 № ${issue.no} 를 발송합니다. 되돌릴 수 없습니다.</p>
-    <button class="bapprove" onclick="doSend()">승인하고 전체 발송</button>
-  </div>
+</div>
+
+<div class="card">
+  <div class="ct">전체 발송</div>
+  ${actionBlock}
   <div class="msg" id="msg"></div>
 </div>
 
 <script>
   var KEY=${JSON.stringify(key)}, SLUG=${JSON.stringify(slug)};
-  function post(action,cb){
-    var b=new URLSearchParams({action:action,slug:SLUG,confirm:action==='send'?'YES':''});
-    document.getElementById('msg').textContent='발송 중…';
+  function post(action){
+    var to=(document.getElementById('to')||{}).value||'';
+    var b=new URLSearchParams({action:action,slug:SLUG,to:to});
+    var m=document.getElementById('msg');m.className='msg';m.textContent='처리 중…';
     fetch('?key='+encodeURIComponent(KEY),{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:b})
       .then(function(r){return r.json();})
-      .then(function(j){var m=document.getElementById('msg');m.className='msg '+(j.ok?'ok':'err');m.textContent=j.message;if(j.ok&&action==='send'){document.querySelector('.bsend').disabled=true;document.getElementById('cf').classList.remove('show');}})
-      .catch(function(e){var m=document.getElementById('msg');m.className='msg err';m.textContent='오류: '+e;});
+      .then(function(j){m.className='msg '+(j.ok?'ok':'err');m.textContent=j.message;if(j.ok&&(action==='schedule'||action==='cancel'))setTimeout(function(){location.reload();},1200);})
+      .catch(function(e){m.className='msg err';m.textContent='오류: '+e;});
   }
   function doTest(){post('test');}
-  function doSend(){post('send');}
 </script>
 </div></body></html>`;
   return new Response(page, { headers: { 'content-type': 'text/html; charset=utf-8' } });
@@ -204,45 +274,61 @@ export async function onRequestGet({ request, env }) {
 export async function onRequestPost({ request, env }) {
   const url = new URL(request.url);
   const key = url.searchParams.get('key') || '';
-  const bad = guard(env, key); if (bad) return new Response(JSON.stringify({ ok: false, message: '인증 실패' }), { status: bad.status, headers: { 'content-type': 'application/json' } });
-
   const json = (o, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { 'content-type': 'application/json' } });
+  const bad = guard(env, key); if (bad) return json({ ok: false, message: '인증 실패' }, bad.status);
+  if (!env.DB) return json({ ok: false, message: 'D1 미연결' });
   if (!env.NEWSLETTER_SENDER || !env.GMAIL_REFRESH_TOKEN || !env.GMAIL_CLIENT_ID || !env.GMAIL_CLIENT_SECRET)
-    return json({ ok: false, message: '발신 시크릿 미설정 — CF에 GMAIL_* / NEWSLETTER_SENDER 등록 필요' });
+    return json({ ok: false, message: '발신 시크릿 미설정 — CF에 GMAIL_* / NEWSLETTER_SENDER 등록 후 재배포' });
 
   const form = await request.formData();
   const action = form.get('action');
-  const slug = form.get('slug');
-  const issue = ISSUES.find((i) => i.slug === slug);
-  if (!issue) return json({ ok: false, message: '알 수 없는 호' });
-  const { subject, html, plain } = renderEmail(issue);
+  await ensureTables(env);
 
   try {
-    const token = await accessToken(env);
-
-    if (action === 'test') {
-      const id = await gmailSend(env, token, [], `[테스트] ${subject}`, plain, html);
-      return json({ ok: true, message: `테스트 발송 완료 → ${env.NEWSLETTER_SENDER} (id ${id})` });
+    // ── 타이머(GitHub Actions)가 부르는 예약 실행 ──
+    if (action === 'run-due') {
+      const nowIso = new Date().toISOString();
+      const { results } = await env.DB.prepare("SELECT slug FROM schedule WHERE status='scheduled' AND scheduled_for<=?").bind(nowIso).all();
+      const due = results || [];
+      if (!due.length) return json({ ok: true, message: '예약 없음' });
+      const token = await accessToken(env);
+      const done = [];
+      for (const row of due) {
+        const issue = ISSUES.find((i) => i.slug === row.slug);
+        if (!issue) continue;
+        const dup = await env.DB.prepare('SELECT slug FROM sends WHERE slug=?').bind(row.slug).first();
+        if (dup) { await env.DB.prepare("UPDATE schedule SET status='sent' WHERE slug=?").bind(row.slug).run(); continue; }
+        const sent = await sendToAll(env, token, issue);
+        await env.DB.prepare("UPDATE schedule SET status='sent' WHERE slug=?").bind(row.slug).run();
+        done.push(`№ ${issue.no}(${sent}명)`);
+      }
+      return json({ ok: true, message: '발송: ' + (done.join(', ') || '없음') });
     }
 
-    if (action === 'send') {
-      if (form.get('confirm') !== 'YES') return json({ ok: false, message: '승인 미확인' });
-      if (!env.DB) return json({ ok: false, message: 'D1 미연결' });
-      await env.DB.prepare('CREATE TABLE IF NOT EXISTS sends (slug TEXT PRIMARY KEY, subject TEXT, recipients INTEGER, sent_at TEXT NOT NULL DEFAULT (datetime(\'now\')))').run();
+    const slug = form.get('slug');
+    const issue = ISSUES.find((i) => i.slug === slug);
+    if (!issue) return json({ ok: false, message: '알 수 없는 호' });
+
+    if (action === 'test') {
+      const to = String(form.get('to') || env.NEWSLETTER_SENDER).split(',').map((s) => s.trim()).filter((s) => s.includes('@'));
+      if (!to.length) return json({ ok: false, message: '받을 주소가 없음' });
+      const { subject, html, plain } = renderEmail(issue);
+      const token = await accessToken(env);
+      const id = await gmailSend(env, token, to.join(', '), [], `[테스트] ${subject}`, plain, html);
+      return json({ ok: true, message: `테스트 발송 완료 → ${to.join(', ')} (id ${id})` });
+    }
+
+    if (action === 'schedule') {
       const dup = await env.DB.prepare('SELECT slug FROM sends WHERE slug=?').bind(slug).first();
-      if (dup) return json({ ok: false, message: '이미 발송된 호 — 재발송 차단' });
+      if (dup) return json({ ok: false, message: '이미 발송된 호' });
+      const when = next10KST(Date.now()).toISOString();
+      await env.DB.prepare("INSERT INTO schedule (slug,status,scheduled_for) VALUES (?,?,?) ON CONFLICT(slug) DO UPDATE SET status='scheduled', scheduled_for=excluded.scheduled_for").bind(slug, 'scheduled', when).run();
+      return json({ ok: true, message: `✅ ${fmtKST(when)} 발송 예약됨` });
+    }
 
-      const { results } = await env.DB.prepare('SELECT email FROM subscribers').all();
-      const emails = [...new Set((results || []).map((r) => (r.email || '').trim().toLowerCase()).filter((e) => e && e.includes('@')))];
-      if (!emails.length) return json({ ok: false, message: '구독자 0명' });
-
-      let sent = 0;
-      for (let i = 0; i < emails.length; i += BCC_BATCH) {
-        await gmailSend(env, token, emails.slice(i, i + BCC_BATCH), subject, plain, html);
-        sent += Math.min(BCC_BATCH, emails.length - i);
-      }
-      await env.DB.prepare('INSERT INTO sends (slug, subject, recipients) VALUES (?,?,?)').bind(slug, subject, sent).run();
-      return json({ ok: true, message: `✅ 전체 발송 완료 — № ${issue.no}, ${sent}명` });
+    if (action === 'cancel') {
+      await env.DB.prepare("UPDATE schedule SET status='cancelled' WHERE slug=? AND status='scheduled'").bind(slug).run();
+      return json({ ok: true, message: '예약이 취소되었습니다' });
     }
 
     return json({ ok: false, message: '알 수 없는 action' });
