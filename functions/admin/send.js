@@ -174,7 +174,7 @@ export async function onRequestGet({ request, env }) {
       <div class="row"><button class="bcancel" onclick="doCancel()">승인 취소</button></div>`;
   } else {
     actionBlock = `<div class="row">
-        <button class="bsend" ${senderSet ? '' : 'disabled'} onclick="doApprove()">전체 발송 승인…</button>
+        <button class="bsend" ${senderSet ? '' : 'disabled'} onclick="doApprove()">전체 발송 승인</button>
       </div>`;
   }
 
