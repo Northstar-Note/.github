@@ -50,11 +50,12 @@ STATE = os.path.join(RUNTIME, "state.json")
 LEDGER_DIR = os.path.join(RUNTIME, "ledger")
 LOCK_PATH = os.path.join(RUNTIME, ".lock")
 APPROVAL = os.path.join(OPS, "approval.txt")
-SUPPRESSION = os.path.join(OPS, "suppression.txt")
+SUPPRESSION = os.path.join(RUNTIME, "suppression.txt")  # gitignored — 해지 주소(PII)는 레포에 안 들어감
 KEYCHAIN_SERVICE = "northstar-admin"  # macOS 키체인 폴백용 (env가 우선)
 SENDER = os.environ.get("NORTHSTAR_SENDER", "PENDING-NEWSLETTER-ACCOUNT")  # 뉴스레터 계정으로 교체
 BCC_BATCH = 80
 MIN_DAYS_BETWEEN = 12  # 격주 (사이트 약속: "격주로 한 편씩")
+MAX_RECIPIENTS = 480   # 개인 Gmail 수신자/24h 한도(≈500) 아래 fail-closed 캡
 POLL_TRIES, POLL_WAIT = 15, 20
 
 
@@ -75,11 +76,10 @@ def die(msg, code=1):
 def run(cmd, cwd=REPO, check=True, redact=False):
     r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
     if check and r.returncode != 0:
-        shown = f"{cmd[0]} [REDACTED]" if redact else " ".join(cmd)
-        err = (r.stderr or "").strip()
         if redact:
-            err = err[:200]  # 수신자/본문이 에러에 에코될 수 있음 — 최소만
-        die(f"명령 실패 {shown}: {err[:400]}")
+            # stderr에 수신자/본문이 에코될 수 있음 — 내용은 버리고 종류만 기록
+            die(f"명령 실패 {cmd[0]} [REDACTED]: exit={r.returncode}")
+        die(f"명령 실패 {' '.join(cmd)}: {(r.stderr or '').strip()[:400]}")
     return r
 
 
@@ -137,7 +137,7 @@ def approval_ok(slug):
     if not os.path.exists(APPROVAL):
         return False
     txt = open(APPROVAL, encoding="utf-8").read()
-    return bool(re.search(rf"^APPROVED:\s+(ALL|{re.escape(slug)})\b", txt, re.M))
+    return bool(re.search(rf"^APPROVED:\s+(ALL|{re.escape(slug)})(?:\s|$)", txt, re.M))
 
 
 def approval_check(slug):
@@ -294,6 +294,8 @@ def fetch_subscribers(key):
         log(f"suppression 제외: {dropped}명")
     if not emails:
         die("구독자 0명 — 발송 중단")
+    if len(emails) > MAX_RECIPIENTS:
+        die(f"구독자 {len(emails)}명 > 캡 {MAX_RECIPIENTS} (개인 Gmail 한도) — 발송 서비스 전환 필요")
     return emails
 
 
@@ -344,6 +346,19 @@ def load_or_create_ledger(issue, subject, emails):
             f"ledger에 결과 불명 배치 {stuck} — 자동 재발송 금지. "
             f"발신 계정 Sent 메일함 교차확인 후 {path} 의 status를 sent/pending으로 수동 교정"
         )
+    # pending 배치는 '현재' 구독자∩suppression 결과로 재필터 —
+    # 그 사이 해지/삭제된 주소로 과거 스냅샷을 그대로 쏘지 않는다. (신규 구독자는
+    # 이 호에 추가하지 않음 — 캠페인 스냅샷 유지, 중복발송 방지 우선.)
+    current = set(emails)
+    dropped = 0
+    for b in ledger["batches"]:
+        if b["status"] == "pending":
+            kept = [e for e in b["emails"] if e in current]
+            dropped += len(b["emails"]) - len(kept)
+            b["emails"] = kept
+    if dropped:
+        log(f"ledger 재개: 해지/삭제된 {dropped}명 pending 배치에서 제외")
+        atomic_write(path, ledger)
     log(f"기존 ledger 재개: {path}")
     return path, ledger
 
@@ -358,6 +373,10 @@ def send_batches(issue, subject, html, plain, emails, dry):
     for b in ledger["batches"]:
         if b["status"] == "sent":
             log(f"배치 {b['n']}/{total}: 이미 발송됨 — 건너뜀")
+            continue
+        if not b["emails"]:
+            b["status"] = "sent"; b["message_id"] = "empty-after-filter"
+            atomic_write(path, ledger)
             continue
         b["status"] = "sending"
         atomic_write(path, ledger)
@@ -403,6 +422,9 @@ def main():
     order = load_json(os.path.join(OPS, "issue_order.json"))
     state = load_json(STATE, {"sent": []})
 
+    if not dry and "PENDING" in SENDER:
+        die("발신 계정 미확정 — NORTHSTAR_SENDER 설정 필요 (normal/resume 공통 게이트)")
+
     if args.resume_email:
         if any(s["slug"] == args.resume_email for s in state.get("sent", [])):
             die(f"{args.resume_email} 는 이미 발송 완료로 기록됨 — resume 거부")
@@ -426,8 +448,6 @@ def main():
     due_check(state, args.force or dry)
     if not dry:
         approval_check(issue["slug"])
-        if "PENDING" in SENDER:
-            die("발신 계정 미확정 — SENDER 교체 필요")
 
     if not dry:
         repo_check()
