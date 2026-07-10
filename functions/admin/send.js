@@ -171,14 +171,10 @@ export async function onRequestGet({ request, env }) {
     actionBlock = `<div class="state ok">✅ 이미 발송 완료된 호입니다.</div>`;
   } else if (scheduledFor) {
     actionBlock = `<div class="state ok">✅ 승인됨 — <b>${fmtKST(scheduledFor)}</b> 발송 예정.</div>
-      <div class="row"><button class="bcancel" onclick="post('cancel')">승인 취소</button></div>`;
+      <div class="row"><button class="bcancel" onclick="doCancel()">승인 취소</button></div>`;
   } else {
     actionBlock = `<div class="row">
-        <button class="bsend" ${senderSet ? '' : 'disabled'} onclick="document.getElementById('cf').classList.add('show')">전체 발송 승인…</button>
-      </div>
-      <div class="confirm" id="cf">
-        <p>구독자 <b>${count}</b>명에게 № ${issue.no} 를 <b>다음 10:00(KST)</b>에 발송합니다. 승인 후 10시 전까진 취소할 수 있어요.</p>
-        <button class="bapprove" onclick="post('schedule')">승인</button>
+        <button class="bsend" ${senderSet ? '' : 'disabled'} onclick="doApprove()">전체 발송 승인…</button>
       </div>`;
   }
 
@@ -246,6 +242,7 @@ export async function onRequestGet({ request, env }) {
     <input type="email" id="to" value="${esc(env.NEWSLETTER_SENDER || '')}" placeholder="you@example.com" multiple>
     <button class="btest" onclick="doTest()">테스트 발송</button>
   </div>
+  <div class="msg" id="tmsg"></div>
 </div>
 
 <div class="card">
@@ -255,17 +252,23 @@ export async function onRequestGet({ request, env }) {
 </div>
 
 <script>
-  var KEY=${JSON.stringify(key)}, SLUG=${JSON.stringify(slug)};
-  function post(action){
+  var KEY=${JSON.stringify(key)}, SLUG=${JSON.stringify(slug)}, COUNT=${count}, NO=${JSON.stringify(issue.no)};
+  function post(action,msgId){
     var to=(document.getElementById('to')||{}).value||'';
     var b=new URLSearchParams({action:action,slug:SLUG,to:to});
-    var m=document.getElementById('msg');m.className='msg';m.textContent='처리 중…';
+    var m=document.getElementById(msgId);m.className='msg';m.textContent='처리 중…';
     fetch('?key='+encodeURIComponent(KEY),{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:b})
       .then(function(r){return r.json();})
-      .then(function(j){m.className='msg '+(j.ok?'ok':'err');m.textContent=j.message;if(j.ok&&(action==='schedule'||action==='cancel'))setTimeout(function(){location.reload();},1200);})
+      .then(function(j){m.className='msg '+(j.ok?'ok':'err');m.textContent=j.message;if(j.ok&&(action==='schedule'||action==='cancel'))setTimeout(function(){location.reload();},1400);})
       .catch(function(e){m.className='msg err';m.textContent='오류: '+e;});
   }
-  function doTest(){post('test');}
+  function doTest(){post('test','tmsg');}
+  function doApprove(){
+    if(confirm('구독자 '+COUNT+'명에게 № '+NO+' 를 다음 10:00(KST)에 발송합니다.\\n승인하시겠어요?  (10시 전까진 취소 가능)')) post('schedule','msg');
+  }
+  function doCancel(){
+    if(confirm('발송 승인을 취소할까요?')) post('cancel','msg');
+  }
 </script>
 </div></body></html>`;
   return new Response(page, { headers: { 'content-type': 'text/html; charset=utf-8' } });
