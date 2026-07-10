@@ -159,6 +159,11 @@ export async function onRequestGet({ request, env }) {
   const slug = url.searchParams.get('slug') || (ISSUES.find((i) => !sentSlugs.has(i.slug) && !sched[i.slug]) || ISSUES[0]).slug;
   const issue = ISSUES.find((i) => i.slug === slug) || ISSUES[0];
   const { subject, html } = renderEmail(issue);
+  // 프리뷰용: '전문 읽기' 링크에 ?key= 붙여 어드민이 실제 기사 확인(새 탭). 발송 메일은 키 없음.
+  const previewHtml = html.replace(
+    `href="${SITE}/issues/${issue.slug}/"`,
+    `href="${SITE}/issues/${issue.slug}/?key=${encodeURIComponent(key)}" target="_blank"`,
+  );
   const already = sentSlugs.has(issue.slug);
   const scheduledFor = sched[issue.slug];
   const senderSet = !!env.NEWSLETTER_SENDER && !!env.GMAIL_REFRESH_TOKEN;
@@ -236,7 +241,7 @@ export async function onRequestGet({ request, env }) {
       <div class="ifrom">${NEWSLETTER_NAME} <span>&lt;${esc(env.NEWSLETTER_SENDER || 'sender')}&gt;</span></div>
       <div class="isubj">${esc(subject)}</div>
     </div>
-    <div class="iprev"><iframe srcdoc="${esc(html)}"></iframe></div>
+    <div class="iprev"><iframe srcdoc="${esc(previewHtml)}"></iframe></div>
   </div>
 </div>
 
