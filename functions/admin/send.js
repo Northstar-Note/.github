@@ -46,7 +46,9 @@ function nextSendKST(nowMs) {
   return new Date(t);
 }
 function fmtKST(iso) {
-  const d = new Date(new Date(iso).getTime() + 9 * 3600 * 1000);
+  let s = String(iso);
+  if (s.indexOf('T') === -1) s = s.replace(' ', 'T') + 'Z'; // SQLite datetime → ISO UTC
+  const d = new Date(new Date(s).getTime() + 9 * 3600 * 1000);
   const p = (n) => String(n).padStart(2, '0');
   return `${p(d.getUTCMonth() + 1)}/${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())} KST`;
 }
@@ -149,8 +151,8 @@ export async function onRequestGet({ request, env }) {
       count = c?.n || 0;
       const s1 = await env.DB.prepare('SELECT slug FROM sends').all();
       sentSlugs = new Set((s1.results || []).map((r) => r.slug));
-      const s2 = await env.DB.prepare("SELECT slug, status, scheduled_for FROM schedule WHERE status='scheduled'").all();
-      (s2.results || []).forEach((r) => { sched[r.slug] = r.scheduled_for; });
+      const s2 = await env.DB.prepare("SELECT slug, status, scheduled_for, created_at FROM schedule WHERE status='scheduled'").all();
+      (s2.results || []).forEach((r) => { sched[r.slug] = { for: r.scheduled_for, at: r.created_at }; });
     } catch (e) { /* 표시는 계속 */ }
   }
 
@@ -170,7 +172,7 @@ export async function onRequestGet({ request, env }) {
   if (already) {
     actionBlock = `<div class="state ok">✅ 이미 발송 완료된 호입니다.</div>`;
   } else if (scheduledFor) {
-    actionBlock = `<div class="state ok">✅ 승인됨 — <b>${fmtKST(scheduledFor)}</b> 발송 예정.</div>
+    actionBlock = `<div class="state ok">✅ 승인 완료 · ${fmtKST(scheduledFor.at)} 승인됨<br>→ <b>${fmtKST(scheduledFor.for)}</b> 발송 예정</div>
       <div class="row"><button class="bcancel" onclick="doCancel()">승인 취소</button></div>`;
   } else {
     actionBlock = `<div class="row">
