@@ -9,7 +9,7 @@
 ## 무엇을 하나 (send_next_issue.py --live)
 
 1. state에서 다음 호 결정 (issue_order.json 순서) + 격주 주기 확인 (12일 미만이면 스스로 종료 — 스케줄러는 매주 토요일 등록)
-2. 승인 게이트: approval.txt에 `APPROVED: <slug 또는 ALL> <날짜> <메모>` 줄 (매 호 확인용 스위치)
+2. 승인 게이트: `runtime/approval.txt`에 `APPROVED: <slug 또는 ALL> <날짜> <메모>` 줄 (매 호 확인용 스위치, gitignored라 커밋 불필요 — 형식은 approval.example.txt)
 3. 레포 검증: branch==main + clean + pull --ff-only
 4. 잠금 해제 (검증 전부 통과 후에만 쓰기): patches/<slug>.json exact-match 적용(홈 히어로·공지바·발행목록 카드) + full.html→index.html 스왑 + og:url 교정
    - 누가 페이지를 고쳐서 패치가 안 맞으면 **디스크 무변경으로 중단** → `python3 gen_patches.py` 재생성 후 재시도
@@ -28,7 +28,7 @@
 2. **발송 커맨드**: send_next_issue.py의 `환경 어댑트 지점` 주석 참조 — 기본은 gog CLI(Gmail),
    다른 도구(Gmail API/SMTP)를 쓰면 그 커맨드 한 곳만 교체
 3. **ADMIN_KEY**: env `NORTHSTAR_ADMIN_KEY` (macOS면 키체인 `northstar-admin`도 됨). **코드/레포에 넣지 말 것**
-4. **드라이런** → **1명 테스트 발송** (자기 주소로) → approval.txt에 승인 줄 → 스케줄 등록
+4. **드라이런** → **1명 테스트 발송** (자기 주소로) → runtime/approval.txt에 승인 줄 → 스케줄 등록
 5. **스케줄**: 매주 토요일 10:00 KST에 `python3 tools/newsletter/send_next_issue.py --live`
    - macOS: example-launchd.plist 참고 / Linux: cron `0 10 * * 6` (TZ 확인) / Windows: 작업 스케줄러
    - **자동화 전용 클론 권장**: 평소 작업하는 checkout 말고 `git clone`을 하나 더 떠서 거기서 실행
@@ -53,6 +53,6 @@
 - 나머지 로직(잠금 해제 패치, 배포 검증, 중복 방지 ledger, 수신거부)은 그대로 사용
 - 실행 위치: 자동화 전용 클론을 하나 새로 떠서 거기서 돌려 (내 작업 checkout 말고)
 - 순서: ①드라이런 실행해서 계획 보여줘 ②내 주소로 테스트 1통 ③내가 OK 하면
-  approval.txt에 승인 줄 넣고 격주 토요일 10:00 KST 스케줄 등록 (매주 등록, 격주는 스크립트가 알아서)
+  runtime/approval.txt에 승인 줄 넣고 격주 토요일 10:00 KST 스케줄 등록 (매주 등록, 격주는 스크립트가 알아서)
 - 절대 규칙: 테스트 전에 전체 구독자에게 보내지 마. 실패하면 재발송 전에 ledger 상태를 나한테 보여줘.
 ```

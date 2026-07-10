@@ -49,7 +49,7 @@ LOG = os.path.join(LOG_DIR, "send.log")
 STATE = os.path.join(RUNTIME, "state.json")
 LEDGER_DIR = os.path.join(RUNTIME, "ledger")
 LOCK_PATH = os.path.join(RUNTIME, ".lock")
-APPROVAL = os.path.join(OPS, "approval.txt")
+APPROVAL = os.path.join(RUNTIME, "approval.txt")  # gitignored — 승인 줄 추가가 repo clean 검사를 깨지 않게
 SUPPRESSION = os.path.join(RUNTIME, "suppression.txt")  # gitignored — 해지 주소(PII)는 레포에 안 들어감
 KEYCHAIN_SERVICE = "northstar-admin"  # macOS 키체인 폴백용 (env가 우선)
 SENDER = os.environ.get("NORTHSTAR_SENDER", "PENDING-NEWSLETTER-ACCOUNT")  # 뉴스레터 계정으로 교체
@@ -142,7 +142,7 @@ def approval_ok(slug):
 
 def approval_check(slug):
     if not approval_ok(slug):
-        die(f"approval.txt에 '{slug}'(또는 ALL) 승인 없음 — 형식: 'APPROVED: <slug|ALL> <날짜> <근거>'")
+        die(f"runtime/approval.txt에 '{slug}'(또는 ALL) 승인 없음 — 형식: 'APPROVED: <slug|ALL> <날짜> <메모>' (approval.example.txt 참조)")
 
 
 def repo_check():

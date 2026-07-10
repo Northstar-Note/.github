@@ -1,0 +1,5 @@
+PENDING - 발송 승인 대기. (이 파일은 예시 - 실제 승인은 runtime/approval.txt에)
+
+발송하려면 runtime/approval.txt 에 아래 형식의 줄을 추가:
+"APPROVED: <호 slug 또는 ALL> <날짜> <메모>" (따옴표 없이, 줄 시작에)
+runtime/ 은 gitignored라 커밋 불필요.
