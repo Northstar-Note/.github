@@ -249,7 +249,7 @@ export async function onRequestGet({ request, env }) {
   <div class="ct">테스트 발송</div>
   <label>받을 주소</label>
   <div id="tolist">
-    <div class="toitem"><input type="email" class="toin" value="${esc(env.NEWSLETTER_SENDER || '')}" placeholder="you@example.com"><button class="brem" type="button" onclick="remTo(this)">×</button></div>
+    <div class="toitem"><input type="email" class="toin" placeholder="you@example.com"><button class="brem" type="button" onclick="remTo(this)">×</button></div>
   </div>
   <div class="row" style="margin-top:10px">
     <button class="badd" type="button" onclick="addTo()">+ 주소 추가</button>
