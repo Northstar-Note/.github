@@ -1,0 +1,12 @@
+[
+  {
+    "file": "issues/index.html",
+    "find": "<div class=\"ientry\">\n      <div class=\"cov\">\n        <span class=\"chip\">다음 호</span>\n        <span class=\"eyc\">№ 005 · Ray</span>\n        <div class=\"ghost num\">05</div>\n      </div>\n      <div class=\"txt\">\n        <span class=\"eyebrow\">다섯 번째 이야기 · 두 달을 하루로</span>\n        <h3>AI에게 ‘판단’이 아니라 ‘지우기’를 시켰습니다</h3>\n        <p>두 달짜리 특허 1차 검토를 하루로. AI에게 정답을 묻는 대신 ‘명백히 아닌 것’을 지우게 하고, 위험한 5%는 사람이 쥔 이야기.</p>\n        <span class=\"read\">다음 호 · 곧 공개</span>\n      </div>\n    </div>",
+    "replace": "<a class=\"ientry\" href=\"issue-005-erase-not-judge/\">\n      <div class=\"cov\">\n        <span class=\"eyc\">№ 005 · Ray</span>\n        <div class=\"ghost num\">05</div>\n      </div>\n      <div class=\"txt\">\n        <span class=\"eyebrow\">다섯 번째 이야기 · 두 달을 하루로</span>\n        <h3>AI에게 ‘판단’이 아니라 ‘지우기’를 시켰습니다</h3>\n        <p>두 달짜리 특허 1차 검토를 하루로. AI에게 정답을 묻는 대신 ‘명백히 아닌 것’을 지우게 하고, 위험한 5%는 사람이 쥔 이야기.</p>\n        <span class=\"read\">전문 읽기 →</span>\n      </div>\n    </a>"
+  },
+  {
+    "file": "index.html",
+    "find": "<div class=\"card\">\n      <span class=\"chip\">곧 공개</span>\n      <span class=\"eyc\">№ 005 · Ray</span>\n      <h3>AI에게 ‘판단’이 아니라 ‘지우기’를 시켰습니다</h3>\n    </div>\n",
+    "replace": ""
+  }
+]

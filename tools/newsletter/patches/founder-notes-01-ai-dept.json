@@ -1,0 +1,22 @@
+[
+  {
+    "file": "issues/index.html",
+    "find": "<div class=\"ientry\">\n      <div class=\"cov\">\n        <span class=\"chip\">창간호</span>\n        <span class=\"eyc\">№ 001 · 창간호</span>\n        <div class=\"ghost num\">01</div>\n      </div>\n      <div class=\"txt\">\n        <span class=\"eyebrow\">우리가 시작한 이유</span>\n        <h3>담당도 아닌 부서가 쓴 보고서가, 조용히 윗선으로 돌았다</h3>\n        <p>전문분야도 아닌 보고서 한 건, 그 일주일이 시작이었습니다. 뽑는 건 AI, 틀리면 안 되는 건 사람이 끝까지 검증한다 — _y Tower의 뼈대가 된 규율.</p>\n        <span class=\"read\">창간호 · 곧 공개</span>\n      </div>\n    </div>",
+    "replace": "<a class=\"ientry\" href=\"founder-notes-01-ai-dept/\">\n      <div class=\"cov\">\n        <span class=\"chip\">창간호</span>\n        <span class=\"eyc\">№ 001 · 창간호</span>\n        <div class=\"ghost num\">01</div>\n      </div>\n      <div class=\"txt\">\n        <span class=\"eyebrow\">우리가 시작한 이유</span>\n        <h3>담당도 아닌 부서가 쓴 보고서가, 조용히 윗선으로 돌았다</h3>\n        <p>전문분야도 아닌 보고서 한 건, 그 일주일이 시작이었습니다. 뽑는 건 AI, 틀리면 안 되는 건 사람이 끝까지 검증한다 — _y Tower의 뼈대가 된 규율.</p>\n        <span class=\"read\">전문 읽기 →</span>\n      </div>\n    </a>"
+  },
+  {
+    "file": "index.html",
+    "find": "<a class=\"cover\" href=\"#subscribe\">",
+    "replace": "<a class=\"cover\" href=\"issues/founder-notes-01-ai-dept/\">"
+  },
+  {
+    "file": "index.html",
+    "find": "<span class=\"cover-soon\" aria-disabled=\"true\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7.5V12l3 1.8\"/></svg>공개 준비 중</span>",
+    "replace": "<span class=\"cover-soon\">창간호 읽기 →</span>"
+  },
+  {
+    "file": "index.html",
+    "find": "    <span>창간호를 준비하고 있어요</span>\n    <a href=\"#subscribe\">미리 구독하기 →</a>",
+    "replace": "    <span>창간호가 나왔어요</span>\n    <a href=\"issues/founder-notes-01-ai-dept/\">지금 읽기 →</a>"
+  }
+]

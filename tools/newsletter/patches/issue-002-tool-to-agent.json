@@ -1,0 +1,12 @@
+[
+  {
+    "file": "issues/index.html",
+    "find": "<div class=\"ientry\">\n      <div class=\"cov\">\n        <span class=\"chip\">다음 호</span>\n        <span class=\"eyc\">№ 002 · Ray</span>\n        <div class=\"ghost num\">02</div>\n      </div>\n      <div class=\"txt\">\n        <span class=\"eyebrow\">두 번째 이야기 · 연구소에서</span>\n        <h3>검색해주는 도구에서, 손발이 되는 에이전트로</h3>\n        <p>요구사항의 홍수 속에 기술 개발이 뒤로 밀리는 연구소. 셋이서 열 몫을 하는 팀이 AI를 도구가 아니라 손발로 다시 놓아본 이야기.</p>\n        <span class=\"read\">다음 호 · 곧 공개</span>\n      </div>\n    </div>",
+    "replace": "<a class=\"ientry\" href=\"issue-002-tool-to-agent/\">\n      <div class=\"cov\">\n        <span class=\"eyc\">№ 002 · Ray</span>\n        <div class=\"ghost num\">02</div>\n      </div>\n      <div class=\"txt\">\n        <span class=\"eyebrow\">두 번째 이야기 · 연구소에서</span>\n        <h3>검색해주는 도구에서, 손발이 되는 에이전트로</h3>\n        <p>요구사항의 홍수 속에 기술 개발이 뒤로 밀리는 연구소. 셋이서 열 몫을 하는 팀이 AI를 도구가 아니라 손발로 다시 놓아본 이야기.</p>\n        <span class=\"read\">전문 읽기 →</span>\n      </div>\n    </a>"
+  },
+  {
+    "file": "index.html",
+    "find": "<div class=\"card\">\n      <span class=\"chip\">곧 공개</span>\n      <span class=\"eyc\">№ 002 · Ray</span>\n      <h3>검색해주는 도구에서, 손발이 되는 에이전트로</h3>\n    </div>\n",
+    "replace": ""
+  }
+]

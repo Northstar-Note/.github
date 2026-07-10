@@ -1,0 +1,12 @@
+[
+  {
+    "file": "issues/index.html",
+    "find": "<div class=\"ientry\">\n      <div class=\"cov\">\n        <span class=\"chip\">다음 호</span>\n        <span class=\"eyc\">№ 003 · Dmitri</span>\n        <div class=\"ghost num\">03</div>\n      </div>\n      <div class=\"txt\">\n        <span class=\"eyebrow\">혼자, 그러나 혼자가 아닌</span>\n        <h3>13명을 모으려다, AI와 둘이 남았다</h3>\n        <p>사람이 부족해서라 여겨 열세 명까지 모았지만, 흩어지고 남은 건 나 혼자. 그 자리를 사람 대신 AI로 채우기까지의 반년.</p>\n        <span class=\"read\">다음 호 · 곧 공개</span>\n      </div>\n    </div>",
+    "replace": "<a class=\"ientry\" href=\"issue-13to1/\">\n      <div class=\"cov\">\n        <span class=\"eyc\">№ 003 · Dmitri</span>\n        <div class=\"ghost num\">03</div>\n      </div>\n      <div class=\"txt\">\n        <span class=\"eyebrow\">혼자, 그러나 혼자가 아닌</span>\n        <h3>13명을 모으려다, AI와 둘이 남았다</h3>\n        <p>사람이 부족해서라 여겨 열세 명까지 모았지만, 흩어지고 남은 건 나 혼자. 그 자리를 사람 대신 AI로 채우기까지의 반년.</p>\n        <span class=\"read\">전문 읽기 →</span>\n      </div>\n    </a>"
+  },
+  {
+    "file": "index.html",
+    "find": "<div class=\"card\">\n      <span class=\"chip\">곧 공개</span>\n      <span class=\"eyc\">№ 003 · Dmitri</span>\n      <h3>13명을 모으려다, AI와 둘이 남았다</h3>\n    </div>\n",
+    "replace": ""
+  }
+]
