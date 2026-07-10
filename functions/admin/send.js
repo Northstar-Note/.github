@@ -37,12 +37,12 @@ const b64 = (str) => { const by = new TextEncoder().encode(str); let bin = ''; f
 const b64url = (str) => b64(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const encWord = (s) => `=?UTF-8?B?${b64(s)}?=`;
 
-// 다음 10:00 KST(=01:00 UTC)의 UTC Date. 이미 지났으면 다음날.
-function next10KST(nowMs) {
-  const now = new Date(nowMs);
+// 다음 토요일 10:00 KST(=01:00 UTC)의 UTC Date. 주 1회 발송.
+function nextSendKST(nowMs) {
   const kst = new Date(nowMs + 9 * 3600 * 1000); // KST 벽시계를 UTC 필드로
-  let t = Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate(), 1, 0, 0); // 10:00 KST
-  if (t <= now.getTime()) t += 24 * 3600 * 1000;
+  const daysUntilSat = (6 - kst.getUTCDay() + 7) % 7; // 0=일..6=토 (KST 기준)
+  let t = Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate() + daysUntilSat, 1, 0, 0);
+  if (t <= nowMs) t += 7 * 24 * 3600 * 1000; // 이미 지난 토요일이면 다음 주
   return new Date(t);
 }
 function fmtKST(iso) {
@@ -216,7 +216,7 @@ export async function onRequestGet({ request, env }) {
   .test-row{display:flex;gap:10px;margin-top:4px}.test-row input{flex:1}
 </style></head><body><div class="wrap">
 <h1>${NEWSLETTER_NAME} · 발송</h1>
-<div class="sub">검토 → 테스트 → 승인. 승인하면 다음 10:00(KST)에 발송, 그 전까진 취소 가능.</div>
+<div class="sub">검토 → 테스트 → 승인. 승인하면 다음 토요일 10:00(KST)에 발송, 그 전까진 취소 가능.</div>
 
 <div class="card">
   <div class="ct">발송할 호</div>
@@ -276,7 +276,7 @@ export async function onRequestGet({ request, env }) {
     post('test','tmsg',to);
   }
   function doApprove(){
-    if(confirm('구독자 '+COUNT+'명에게 № '+NO+' 를 다음 10:00(KST)에 발송합니다.\\n승인하시겠어요?  (10시 전까진 취소 가능)')) post('schedule','msg');
+    if(confirm('구독자 '+COUNT+'명에게 № '+NO+' 를 다음 토요일 10:00(KST)에 발송합니다.\\n승인하시겠어요?  (발송 전까진 취소 가능)')) post('schedule','msg');
   }
   function doCancel(){
     if(confirm('발송 승인을 취소할까요?')) post('cancel','msg');
@@ -336,7 +336,7 @@ export async function onRequestPost({ request, env }) {
     if (action === 'schedule') {
       const dup = await env.DB.prepare('SELECT slug FROM sends WHERE slug=?').bind(slug).first();
       if (dup) return json({ ok: false, message: '이미 발송된 호' });
-      const when = next10KST(Date.now()).toISOString();
+      const when = nextSendKST(Date.now()).toISOString();
       await env.DB.prepare("INSERT INTO schedule (slug,status,scheduled_for) VALUES (?,?,?) ON CONFLICT(slug) DO UPDATE SET status='scheduled', scheduled_for=excluded.scheduled_for").bind(slug, 'scheduled', when).run();
       return json({ ok: true, message: `✅ 승인됨 — ${fmtKST(when)} 발송 예정` });
     }
