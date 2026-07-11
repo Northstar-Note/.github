@@ -354,8 +354,8 @@ export async function onRequestPost({ request, env }) {
     if (action === 'test') {
       const to = String(form.get('to') || env.NEWSLETTER_SENDER).split(',').map((s) => s.trim()).filter((s) => s.includes('@'));
       if (!to.length) return json({ ok: false, message: '받을 주소가 없음' });
-      // 테스트 메일 링크엔 미리보기 키 포함 → 발송 전에도 기사 열림(본인/팀 주소로만 테스트)
-      const { subject, html, plain } = renderEmail(issue, key);
+      // 테스트 메일은 키 없는 링크(실제 발송과 동일 = 발송 전엔 게이트). 기사 미리보기는 어드민 페이지에서.
+      const { subject, html, plain } = renderEmail(issue);
       const token = await accessToken(env);
       const id = await gmailSend(env, token, to.join(', '), [], `[테스트] ${subject}`, plain, html);
       return json({ ok: true, message: `테스트 발송 완료 → ${to.join(', ')} (id ${id})` });
