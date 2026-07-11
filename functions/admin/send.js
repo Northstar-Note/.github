@@ -143,14 +143,15 @@ export async function onRequestGet({ request, env }) {
   const key = url.searchParams.get('key') || '';
   const bad = guard(env, key); if (bad) return bad;
 
-  let count = 0, sentSlugs = new Set(), sched = {};
+  let count = 0, sentSlugs = new Set(), sched = {}, sentInfo = {};
   if (env.DB) {
     try {
       await ensureTables(env);
       const c = await env.DB.prepare('SELECT COUNT(*) AS n FROM subscribers').first();
       count = c?.n || 0;
-      const s1 = await env.DB.prepare('SELECT slug FROM sends').all();
-      sentSlugs = new Set((s1.results || []).map((r) => r.slug));
+      const s1 = await env.DB.prepare('SELECT slug, sent_at, recipients FROM sends').all();
+      (s1.results || []).forEach((r) => { sentInfo[r.slug] = { at: r.sent_at, n: r.recipients }; });
+      sentSlugs = new Set(Object.keys(sentInfo));
       const s2 = await env.DB.prepare("SELECT slug, status, scheduled_for, created_at FROM schedule WHERE status='scheduled'").all();
       (s2.results || []).forEach((r) => { sched[r.slug] = { for: r.scheduled_for, at: r.created_at }; });
     } catch (e) { /* 표시는 계속 */ }
@@ -171,6 +172,14 @@ export async function onRequestGet({ request, env }) {
   const opts = ISSUES.map((i) => {
     const tag = sentSlugs.has(i.slug) ? ' (발송됨)' : sched[i.slug] ? ' (승인됨)' : '';
     return `<option value="${i.slug}"${i.slug === slug ? ' selected' : ''}>№ ${i.no} · ${esc(i.title)}${tag}</option>`;
+  }).join('');
+
+  const statusRows = ISSUES.map((i) => {
+    let st;
+    if (sentInfo[i.slug]) st = `<span class="stt done">발송 완료 · ${fmtKST(sentInfo[i.slug].at)} · ${sentInfo[i.slug].n}명</span>`;
+    else if (sched[i.slug]) st = `<span class="stt sched">승인됨 · ${fmtKST(sched[i.slug].for)} 예정</span>`;
+    else st = `<span class="stt none">미발송</span>`;
+    return `<div class="strow"><span class="stn">№ ${i.no}</span>${st}</div>`;
   }).join('');
 
   let actionBlock;
@@ -221,9 +230,20 @@ export async function onRequestGet({ request, env }) {
   .state.ok{background:#e9efe7;color:var(--accent)}.state.warn{background:#f7ece9;color:var(--warn)}
   .msg{margin-top:14px;font-size:14px;white-space:pre-wrap}.msg.ok{color:var(--accent)}.msg.err{color:var(--warn)}
   .test-row{display:flex;gap:10px;margin-top:4px}.test-row input{flex:1}
+  .strow{display:flex;align-items:baseline;gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .strow:first-child{border-top:0}
+  .stn{color:var(--soft);min-width:44px}
+  .stt.done{color:var(--accent);font-weight:600}
+  .stt.sched{color:#8a3b2e;font-weight:600}
+  .stt.none{color:var(--faint,#989c90)}
 </style></head><body><div class="wrap">
 <h1>${NEWSLETTER_NAME} · 발송</h1>
 <div class="sub">검토 → 테스트 → 승인. 승인하면 다음 토요일 10:00(KST)에 발송, 그 전까진 취소 가능.</div>
+
+<div class="card">
+  <div class="ct">발송 현황</div>
+  ${statusRows}
+</div>
 
 <div class="card">
   <div class="ct">발송할 호</div>
