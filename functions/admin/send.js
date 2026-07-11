@@ -53,8 +53,10 @@ function fmtKST(iso) {
   return `${p(d.getUTCMonth() + 1)}/${p(d.getUTCDate())} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())} KST`;
 }
 
-function renderEmail(issue) {
-  const url = `${SITE}/issues/${issue.slug}/`;
+function renderEmail(issue, previewKey) {
+  const base = `${SITE}/issues/${issue.slug}/`;
+  const url = previewKey ? `${base}?key=${encodeURIComponent(previewKey)}` : base;
+  const linkAttr = previewKey ? ' target="_blank"' : '';
   const kicker = nz(issue.kicker), title = nz(issue.title), deck = nz(issue.deck);
   const html = `<!doctype html><html lang="ko"><body style="margin:0;padding:0;background:#f7f0e1;">
   <div style="max-width:560px;margin:0 auto;padding:48px 24px;font-family:'Pretendard',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:#20221f;word-break:keep-all;">
@@ -62,7 +64,7 @@ function renderEmail(issue) {
     <p style="margin:0 0 12px;font-size:13px;color:#006434;">${kicker}</p>
     <h1 style="margin:0 0 20px;font-size:26px;line-height:1.35;font-weight:400;">${title}</h1>
     <p style="margin:0 0 36px;font-size:16px;line-height:1.7;color:rgba(32,34,31,.8);">${deck}</p>
-    <p style="margin:0 0 56px;"><a href="${url}" style="font-size:16px;color:#006434;text-decoration:underline;text-underline-offset:3px;">전문 읽기 →</a></p>
+    <p style="margin:0 0 56px;"><a href="${url}"${linkAttr} style="font-size:16px;color:#006434;text-decoration:underline;text-underline-offset:3px;">전문 읽기 →</a></p>
     <p style="margin:0;padding-top:20px;border-top:1px solid rgba(32,34,31,.12);font-size:12px;line-height:1.7;color:rgba(32,34,31,.45);">
       이 메일은 <a href="${SITE}" style="color:rgba(32,34,31,.45);">northstar-note.pages.dev</a>에서 구독을 신청하신 분들께 발행 시점에 보내드립니다.<br>
       그만 받고 싶으시면 이 메일에 ‘해지’라고 회신해 주세요. 다음 호부터 빼드립니다.
@@ -116,7 +118,6 @@ async function gmailSend(env, token, to, bcc, subject, plain, html) {
 async function ensureTables(env) {
   await env.DB.prepare("CREATE TABLE IF NOT EXISTS sends (slug TEXT PRIMARY KEY, subject TEXT, recipients INTEGER, sent_at TEXT NOT NULL DEFAULT (datetime('now')))").run();
   await env.DB.prepare("CREATE TABLE IF NOT EXISTS schedule (slug TEXT PRIMARY KEY, status TEXT NOT NULL, scheduled_for TEXT NOT NULL, created_at TEXT NOT NULL DEFAULT (datetime('now')))").run();
-  await env.DB.prepare("CREATE TABLE IF NOT EXISTS test_sends (id INTEGER PRIMARY KEY AUTOINCREMENT, slug TEXT, recipients INTEGER, sent_at TEXT NOT NULL DEFAULT (datetime('now')))").run();
 }
 
 async function sendToAll(env, token, issue) {
@@ -161,23 +162,9 @@ export async function onRequestGet({ request, env }) {
   const slug = url.searchParams.get('slug') || (ISSUES.find((i) => !sentSlugs.has(i.slug) && !sched[i.slug]) || ISSUES[0]).slug;
   const issue = ISSUES.find((i) => i.slug === slug) || ISSUES[0];
 
-  let testHist = [];
-  if (env.DB) {
-    try {
-      const th = await env.DB.prepare('SELECT sent_at, recipients FROM test_sends WHERE slug=? ORDER BY sent_at DESC LIMIT 5').bind(issue.slug).all();
-      testHist = th.results || [];
-    } catch (e) { /* 무시 */ }
-  }
-  const testHistHtml = testHist.length
-    ? testHist.map((r) => `<div class="throw">${fmtKST(r.sent_at)} · ${r.recipients}개 주소</div>`).join('')
-    : '<div class="thnone">아직 없음</div>';
-
-  const { subject, html } = renderEmail(issue);
-  // 프리뷰용: '전문 읽기' 링크에 ?key= 붙여 어드민이 실제 기사 확인(새 탭). 발송 메일은 키 없음.
-  const previewHtml = html.replace(
-    `href="${SITE}/issues/${issue.slug}/"`,
-    `href="${SITE}/issues/${issue.slug}/?key=${encodeURIComponent(key)}" target="_blank"`,
-  );
+  const { subject } = renderEmail(issue);
+  // 프리뷰/테스트: '전문 읽기'에 ?key= 붙여 발송 전에도 기사 열림(새 탭). 실제 발송은 키 없음.
+  const { html: previewHtml } = renderEmail(issue, key);
   const already = sentSlugs.has(issue.slug);
   const scheduledFor = sched[issue.slug];
   const senderSet = !!env.NEWSLETTER_SENDER && !!env.GMAIL_REFRESH_TOKEN;
@@ -249,8 +236,6 @@ export async function onRequestGet({ request, env }) {
   .stt.done{color:var(--accent);font-weight:600}
   .stt.sched{color:#8a3b2e;font-weight:600}
   .stt.none{color:var(--faint,#989c90)}
-  .throw{font-size:13px;color:var(--soft);padding:6px 0;border-top:1px solid var(--line)}
-  .thnone{font-size:13px;color:var(--faint,#989c90);padding:6px 0}
 </style></head><body><div class="wrap">
 <h1>${NEWSLETTER_NAME} · 발송</h1>
 <div class="sub">검토 → 테스트 → 승인. 승인하면 다음 토요일 10:00(KST)에 발송, 그 전까진 취소 가능.</div>
@@ -291,8 +276,6 @@ export async function onRequestGet({ request, env }) {
     <button class="btest" type="button" onclick="doTest()">테스트 발송</button>
   </div>
   <div class="msg" id="tmsg"></div>
-  <div class="ct" style="margin-top:18px">최근 테스트 발송</div>
-  ${testHistHtml}
 </div>
 
 <div class="card">
@@ -308,7 +291,7 @@ export async function onRequestGet({ request, env }) {
     var m=document.getElementById(msgId);m.className='msg';m.textContent='처리 중…';
     fetch('?key='+encodeURIComponent(KEY),{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:b})
       .then(function(r){return r.json();})
-      .then(function(j){m.className='msg '+(j.ok?'ok':'err');m.textContent=j.message;if(j.ok&&(action==='schedule'||action==='cancel'||action==='test'))setTimeout(function(){location.reload();},1600);})
+      .then(function(j){m.className='msg '+(j.ok?'ok':'err');m.textContent=j.message;if(j.ok&&(action==='schedule'||action==='cancel'))setTimeout(function(){location.reload();},1400);})
       .catch(function(e){m.className='msg err';m.textContent='오류: '+e;});
   }
   function addTo(){var d=document.createElement('div');d.className='toitem';d.innerHTML='<input type="email" class="toin" placeholder="you@example.com"><button class="brem" type="button" onclick="remTo(this)">×</button>';document.getElementById('tolist').appendChild(d);}
@@ -371,10 +354,10 @@ export async function onRequestPost({ request, env }) {
     if (action === 'test') {
       const to = String(form.get('to') || env.NEWSLETTER_SENDER).split(',').map((s) => s.trim()).filter((s) => s.includes('@'));
       if (!to.length) return json({ ok: false, message: '받을 주소가 없음' });
-      const { subject, html, plain } = renderEmail(issue);
+      // 테스트 메일 링크엔 미리보기 키 포함 → 발송 전에도 기사 열림(본인/팀 주소로만 테스트)
+      const { subject, html, plain } = renderEmail(issue, key);
       const token = await accessToken(env);
       const id = await gmailSend(env, token, to.join(', '), [], `[테스트] ${subject}`, plain, html);
-      try { await env.DB.prepare('INSERT INTO test_sends (slug, recipients) VALUES (?,?)').bind(slug, to.length).run(); } catch (e) { /* 기록 실패해도 발송은 성공 */ }
       return json({ ok: true, message: `테스트 발송 완료 → ${to.join(', ')} (id ${id})` });
     }
 
