@@ -1,46 +1,41 @@
-# Northstar-Note
-
-**북극성과 시행착오 노트** — 솔로프리너 클럽의 격주 발행 뉴스레터.
-
-직접 해본 것만, 구체적으로(도구·비용·횟수) 씁니다. 포모·과장·구루 화법은 없습니다.
-
-**No rush, no hype. We just keep building.**
+# 북극성과 시행착오 노트
 
 라이브: **https://northstar-note.pages.dev/**
 
-## 기여자 (Contributors)
+---
 
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/kimdzhekhon">
-        <img src="https://avatars.githubusercontent.com/u/231584193?v=4" width="60" style="border-radius:50%"/><br/>
-        <sub>kimdzhekhon</sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/antryu">
-        <img src="https://avatars.githubusercontent.com/u/8435340?v=4" width="60" style="border-radius:50%"/><br/>
-        <sub>antryu</sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/Sophia-Hong">
-        <img src="https://avatars.githubusercontent.com/u/159596352?v=4" width="60" style="border-radius:50%"/><br/>
-        <sub>Sophia-Hong</sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/claude">
-        <img src="https://avatars.githubusercontent.com/u/81847?v=4" width="60" style="border-radius:50%"/><br/>
-        <sub>claude</sub>
-      </a>
-    </td>
-    <td align="center">
-      <a href="https://github.com/junbbbb">
-        <img src="https://avatars.githubusercontent.com/u/113100170?v=4" width="60" style="border-radius:50%"/><br/>
-        <sub>junbbbb</sub>
-      </a>
-    </td>
-  </tr>
-</table>
+## 창간의 변
+
+### AI, 다시 작은 개인의 시대
+
+르네상스는 피렌체의 작은 공방에서 시작됐습니다. 화가와 조각가, 시계공과 해부학자가 한 골목에 섞여 살며 서로의 작업을 들여다보던 시절. 분야가 갈라지기 전이라 한 사람이 그림을 그리다 기계를 설계하고 인체를 해부했습니다. 거대한 자본도 위계도 없이, 작은 개인들이 세상을 직접 들여다보며 사람의 가능성을 꽃피웠습니다.
+
+그러나 그 시대는 오래가지 않았습니다. 학문과 기술이 잘게 나뉘고 전문화되면서, 무언가를 연구하고 만드는 일에도 거대한 자본과 수많은 사람, 긴 조직이 필요해졌습니다. 작은 개인이 끼어들 자리는 점점 좁아졌습니다.
+
+AI는 그 자리를 다시 흔들고 있습니다. 도전하고 실패하고 다시 길을 찾는 동안, 주변엔 호언장담과 포모를 파는 목소리가 많았지만 그들이 말한 대로 되지는 않았습니다. 그래서 우리는 코파운딩이 아니라, 그냥 함께 느슨하게 연대해 보기로 했습니다. 회사도 조합도 아닌, 새로운 협력의 한 모습일지 모릅니다.
+
+다시, 작은 개인의 시대. 느슨하게 연대한 우리가 그 길을 걷고, 시행착오와 북극성의 빛을 적습니다. 그래서 이름을 《북극성과 시행착오 노트》라 지었습니다.
+
+<img src="https://northstar-note.pages.dev/assets/about-firenze.jpg" width="600" alt="피렌체 풍경 수채 일러스트 — 두오모와 베키오 다리, 아르노 강">
+
+## 우리가 지키려는 다섯 가지
+
+**01. 직접 해본 것만 씁니다.**
+“미국 테크는 이렇게 한다더라” 대신, “우리가 Claude로 해봤더니 이렇게 되더라”를 적어요. 관찰자가 아니라 해본 사람으로서, 가능하면 실제 화면까지 같이요.
+
+**02. 조급하게 굴지 않습니다.**
+불안을 부추기지도, 과장하지도 않으려 해요. 그렇다고 이 기술의 놀라움을 낮춰보며 무시하지도 않습니다. 있는 그대로 바라보며, 담담하게, 그렇지만 진심으로.
+
+**03. 실패는 여정의 일부입니다.**
+안 된 건 끝이 아니라 될 때까지 가는 길의 한 칸이라고 봐요. 있는 그대로 보고, 고쳐 다시 해보고, 될 때까지 고민하며 반복해요.
+
+**04. 변하지 않을 것은, 적어둡니다.**
+도구는 매주 바뀌어요. 모델도 가격도 유행도요. 그 아래에서 잘 변하지 않는 원리와 태도, 사람의 자리를 적어두려고 합니다.
+
+**05. 느슨하지만 함께 합니다.**
+엄청난 도구를 쥐었지만 그것만으로는 안 되더라고요. 펜은 돌아가며 잡고, 각자 할 수 있는 몫을 스스로 찾아 거들어요. 열려 있지만, 조금은 우리끼리인 모임.
+
+---
+
+> **Spectators predict. We prove.**
+> 구경꾼은 예측하고, 우리는 증명한다 · No rush, no hype.
