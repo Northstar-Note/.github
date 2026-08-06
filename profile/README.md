@@ -16,7 +16,7 @@ AI는 그 자리를 다시 흔들고 있습니다. 도전하고 실패하고 다
 
 다시, 작은 개인의 시대. 느슨하게 연대한 우리가 그 길을 걷고, 시행착오와 북극성의 빛을 적습니다. 그래서 이름을 《북극성과 시행착오 노트》라 지었습니다.
 
-<img src="https://northstar-note.pages.dev/assets/about-firenze.jpg" width="600" alt="피렌체 풍경 수채 일러스트 — 두오모와 베키오 다리, 아르노 강">
+<img src="https://northstar-note.pages.dev/assets/about-firenze.webp" width="600" alt="피렌체 풍경 수채 일러스트 — 두오모와 베키오 다리, 아르노 강">
 
 ## 우리가 지키려는 다섯 가지
 
